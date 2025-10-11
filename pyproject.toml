@@ -1,0 +1,19 @@
+[project]
+name = "thehand"
+version = "0.0.1"
+description = "TheHand's game project."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "imutils>=0.5.4",
+    "mediapipe>=0.10.21",
+    "pygame-ce>=2.5.5",
+    "pymunk>=7.1.0",
+    "silero-vad>=6.0.0",
+    "sounddevice>=0.5.2",
+]
+
+
+[tool.ty.rules]
+unresolved-attribute = "ignore"
+invalid-argument-type = "ignore"
