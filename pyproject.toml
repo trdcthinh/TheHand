@@ -11,9 +11,13 @@ dependencies = [
     "pymunk>=7.1.0",
     "silero-vad>=6.0.0",
     "sounddevice>=0.5.2",
+    "useful-moonshine-onnx",
 ]
 
 
 [tool.ty.rules]
 unresolved-attribute = "ignore"
 invalid-argument-type = "ignore"
+
+[tool.uv.sources]
+useful-moonshine-onnx = { git = "https://github.com/moonshine-ai/moonshine.git", subdirectory = "moonshine-onnx" }
