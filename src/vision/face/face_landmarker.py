@@ -3,19 +3,18 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks.python import vision, BaseOptions
 
 import mediapipe as mp
+import numpy as np
 import time
 import cv2
 
 
 class FaceLandmarker:
-    def __init__(self, show_window: bool = False):
-        self.show_window = show_window
+    def __init__(self, draw: bool = False):
+        self.draw = draw
 
         self.model = "models/face_landmarker.task"
         self.num_faces = 1
-        self.min_face_detection_confidence = 0.5
-        self.min_face_presence_confidence = 0.5
-        self.min_tracking_confidence = 0.5
+        self.output_face_blendshapes = True
 
         self.counter = 0
         self.fps = 0
@@ -23,21 +22,30 @@ class FaceLandmarker:
         self.detection_result = None
         self.fps_avg_frame_count = 10
 
-        self.label_padding_width = 1500
-        self.label_background_color = (255, 255, 255)
+        self.label_padding_width = 500
 
         base_options = BaseOptions(model_asset_path=self.model)
         options = vision.FaceLandmarkerOptions(
             base_options=base_options,
             running_mode=vision.RunningMode.LIVE_STREAM,
             num_faces=self.num_faces,
-            min_face_detection_confidence=self.min_face_detection_confidence,
-            min_face_presence_confidence=self.min_face_presence_confidence,
-            min_tracking_confidence=self.min_tracking_confidence,
-            output_face_blendshapes=True,
+            output_face_blendshapes=self.output_face_blendshapes,
             result_callback=self.result_callback,
         )
-        self.detector = vision.FaceLandmarker.create_from_options(options)
+        self.landmarker = vision.FaceLandmarker.create_from_options(options)
+
+    def __call__(self, image) -> tuple[vision.FaceLandmarkerResult, np.ndarray]:
+        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+
+        self.landmarker.detect_async(mp_image, time.time_ns() // 1_000_000)
+
+        if self.draw:
+            self.draw_fps(image)
+            self.draw_faces(image)
+            image = self.draw_blendshapes(image)
+
+        return self.detection_result, image
 
     def result_callback(
         self,
@@ -95,83 +103,75 @@ class FaceLandmarker:
             connection_drawing_spec=drawing_styles.get_default_face_mesh_iris_connections_style(),
         )
 
-    def draw_blendshapes(self, frame):
-        legend_x = frame.shape[1] - self.label_padding_width + 20
-        legend_y = 30
-        bar_max_width = self.label_padding_width - 40
-        bar_height = 8
-        gap_between_bars = 5
-        text_gap = 5
-
-        face_blendshapes = self.detection_result.face_blendshapes
-        if face_blendshapes:
-            for idx, category in enumerate(face_blendshapes[0]):
-                category_name = category.category_name
-                score = round(category.score, 2)
-                text = f"{category_name} ({score:.2f})"
-                (text_width, _), _ = cv2.getTextSize(
-                    text, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1
-                )
-                cv2.putText(
-                    frame,
-                    text,
-                    (legend_x, legend_y + (bar_height // 2) + 5),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.4,
-                    (0, 0, 0),
-                    1,
-                    cv2.LINE_AA,
-                )
-                bar_width = int(bar_max_width * score)
-                cv2.rectangle(
-                    frame,
-                    (legend_x + text_width + text_gap, legend_y),
-                    (
-                        legend_x + text_width + text_gap + bar_width,
-                        legend_y + bar_height,
-                    ),
-                    (0, 255, 0),
-                    -1,
-                )
-                legend_y += bar_height + gap_between_bars
-
     def draw_faces(self, image):
         if self.detection_result:
             for face_landmarks in self.detection_result.face_landmarks:
                 self.draw_landmarks(image, face_landmarks)
 
-            image = cv2.copyMakeBorder(
-                image,
-                0,
-                0,
-                0,
-                self.label_padding_width,
-                cv2.BORDER_CONSTANT,
-                None,
-                self.label_background_color,
+    def draw_blendshapes(self, image) -> np.ndarray:
+        if not self.output_face_blendshapes:
+            return image
+
+        expanded_image = cv2.copyMakeBorder(
+            image,
+            0,
+            0,
+            0,
+            self.label_padding_width,
+            cv2.BORDER_CONSTANT,
+            None,
+            (255, 255, 255),
+        )
+
+        if not self.detection_result:
+            return expanded_image
+
+        face_blendshapes = self.detection_result.face_blendshapes
+        if not face_blendshapes:
+            return expanded_image
+
+        legend_x = expanded_image.shape[1] - self.label_padding_width + 20
+        legend_y = 30
+        bar_max_width = self.label_padding_width - legend_y
+        bar_height = 8
+        gap_between_bars = 5
+        text_gap = 5
+
+        for idx, category in enumerate(face_blendshapes[0]):
+            category_name = category.category_name
+            score = round(category.score, 2)
+            text = f"{category_name} ({score:.2f})"
+            (text_width, _), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)
+            cv2.putText(
+                expanded_image,
+                text,
+                (legend_x, legend_y + (bar_height // 2) + 5),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.4,
+                (0, 0, 0),
+                1,
+                cv2.LINE_AA,
             )
-            self.draw_blendshapes(image)
-        return image
+            bar_width = int((bar_max_width - text_width) * score)
+            cv2.rectangle(
+                expanded_image,
+                (legend_x + text_width + text_gap, legend_y),
+                (
+                    legend_x + text_width + text_gap + bar_width,
+                    legend_y + bar_height,
+                ),
+                (0, 255, 0),
+                -1,
+            )
+            legend_y += bar_height + gap_between_bars
 
-    def __call__(self, image):
-        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
-
-        self.detector.detect_async(mp_image, time.time_ns() // 1_000_000)
-
-        if not self.show_window:
-            return
-
-        self.draw_fps(image)
-        output_image = self.draw_faces(image)
-
-        cv2.imshow("Mediapipe Face Landmark", output_image)
+        return expanded_image
 
     def close(self):
-        self.detector.close()
+        self.landmarker.close()
 
 
-if __name__ == "__main__":
+def main():
     from time import sleep
 
     camera = cv2.VideoCapture(0)
@@ -192,7 +192,16 @@ if __name__ == "__main__":
             continue
 
         img = cv2.flip(img, 1)
-        landmarker(img)
+        detection_result, img = landmarker(img)
+
+        if detection_result:
+            print(
+                f"\r{' ' * 80}\rFace detected: {len(detection_result.face_landmarks)}",
+                end="",
+                flush=True,
+            )
+
+        cv2.imshow("Mediapipe Face Landmark", img)
 
         if cv2.waitKey(50) == 27:
             break
@@ -200,3 +209,7 @@ if __name__ == "__main__":
     landmarker.close()
     camera.release()
     cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()

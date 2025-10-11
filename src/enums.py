@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class Command(Enum):
-    DO_SOMETHING = 0
+    DO_NOTHING = 0
     DO_ANOTHER_THING = 1
 
 

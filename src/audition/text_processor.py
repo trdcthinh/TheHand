@@ -6,7 +6,7 @@ class TextProcessor:
         self._targets: list[str] = []
         pass
 
-    def __call__(self, text: str) -> Command | None:
+    def __call__(self, text: str) -> Command:
         """
         Process the text to produce `Command`.
 
@@ -18,7 +18,7 @@ class TextProcessor:
             Command: A command to do in game.
         """
 
-        return Command.DO_SOMETHING
+        return Command.DO_NOTHING
         pass
 
     def set_targets(self, targets: list[str]):

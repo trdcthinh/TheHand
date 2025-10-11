@@ -3,37 +3,56 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks.python import vision, BaseOptions
 
 import mediapipe as mp
+import numpy as np
 import time
 import cv2
 
 
 class HandLandmarker:
-    def __init__(self, show_window: bool = False):
-        self.show_window = show_window
+    def __init__(self, draw: bool = False):
+        self.draw = draw
 
         self.model = "models/hand_landmarker.task"
         self.num_hands = 2
-        self.min_hand_detection_confidence = 0.5
-        self.min_hand_presence_confidence = 0.5
-        self.min_tracking_confidence = 0.5
 
+        self.start_time = time.time()
         self.counter = 0
         self.fps = 0
-        self.start_time = time.time()
-        self.detection_result = None
         self.fps_avg_frame_count = 10
+        self.detection_result = None
 
         base_options = BaseOptions(model_asset_path=self.model)
         options = vision.HandLandmarkerOptions(
             base_options=base_options,
             running_mode=vision.RunningMode.LIVE_STREAM,
             num_hands=self.num_hands,
-            min_hand_detection_confidence=self.min_hand_detection_confidence,
-            min_hand_presence_confidence=self.min_hand_presence_confidence,
-            min_tracking_confidence=self.min_tracking_confidence,
             result_callback=self.result_callback,
         )
         self.landmarker = vision.HandLandmarker.create_from_options(options)
+
+    def __call__(self, image) -> tuple[vision.HandLandmarkerResult, np.ndarray]:
+        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+
+        self.landmarker.detect_async(mp_image, time.time_ns() // 1_000_000)
+
+        if self.draw:
+            self.draw_fps(image)
+            self.draw_hands(image)
+
+        return self.detection_result, image
+
+    def run(self, image) -> tuple[vision.HandLandmarkerResult, np.ndarray]:
+        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+
+        self.landmarker.detect_async(mp_image, time.time_ns() // 1_000_000)
+
+        if self.draw:
+            self.draw_fps(image)
+            self.draw_hands(image)
+
+        return self.detection_result, image
 
     def result_callback(
         self,
@@ -48,12 +67,10 @@ class HandLandmarker:
         self.counter += 1
 
     def draw_fps(self, image):
-        fps_text = f"FPS = {self.fps:.1f}"
-        text_location = (20, 50)
         cv2.putText(
             image,
-            fps_text,
-            text_location,
+            f"FPS = {self.fps:.1f}",
+            (24, 50),
             cv2.FONT_HERSHEY_DUPLEX,
             1,
             (0, 0, 0),
@@ -78,47 +95,32 @@ class HandLandmarker:
         )
 
     def draw_hands(self, image):
-        for idx in range(len(self.detection_result.hand_landmarks)):
-            hand_landmarks = self.detection_result.hand_landmarks[idx]
-            handedness = self.detection_result.handedness[idx]
-            self.draw_landmarks(image, hand_landmarks)
-            height, width, _ = image.shape
-            x_coordinates = [lm.x for lm in hand_landmarks]
-            y_coordinates = [lm.y for lm in hand_landmarks]
-            text_x = int(min(x_coordinates) * width)
-            text_y = int(min(y_coordinates) * height) - 10
-            cv2.putText(
-                image,
-                f"{handedness[0].category_name}",
-                (text_x, text_y),
-                cv2.FONT_HERSHEY_DUPLEX,
-                1,
-                (88, 205, 54),
-                1,
-                cv2.LINE_AA,
-            )
-
-    def __call__(self, image):
-        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
-
-        self.landmarker.detect_async(mp_image, time.time_ns() // 1_000_000)
-
-        if not self.show_window:
-            return
-
-        self.draw_fps(image)
-
         if self.detection_result:
-            self.draw_hands(image)
-
-        cv2.imshow("Mediapipe Hand Landmark", image)
+            for idx in range(len(self.detection_result.hand_landmarks)):
+                hand_landmarks = self.detection_result.hand_landmarks[idx]
+                handedness = self.detection_result.handedness[idx]
+                self.draw_landmarks(image, hand_landmarks)
+                height, width, _ = image.shape
+                x_coordinates = [lm.x for lm in hand_landmarks]
+                y_coordinates = [lm.y for lm in hand_landmarks]
+                text_x = int(min(x_coordinates) * width)
+                text_y = int(min(y_coordinates) * height) - 10
+                cv2.putText(
+                    image,
+                    f"{handedness[0].category_name}",
+                    (text_x, text_y),
+                    cv2.FONT_HERSHEY_DUPLEX,
+                    1,
+                    (88, 205, 54),
+                    1,
+                    cv2.LINE_AA,
+                )
 
     def close(self):
         self.landmarker.close()
 
 
-if __name__ == "__main__":
+def main():
     from time import sleep
 
     camera = cv2.VideoCapture(0)
@@ -139,7 +141,16 @@ if __name__ == "__main__":
             continue
 
         img = cv2.flip(img, 1)
-        landmarker(img)
+        detection_result, img = landmarker(img)
+
+        if detection_result:
+            print(
+                f"\r{' ' * 80}\rHand detected: {len(detection_result.hand_landmarks)}",
+                end="",
+                flush=True,
+            )
+
+        cv2.imshow("Mediapipe Hand Landmark", img)
 
         if cv2.waitKey(50) == 27:
             break
@@ -147,3 +158,7 @@ if __name__ == "__main__":
     landmarker.close()
     camera.release()
     cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()

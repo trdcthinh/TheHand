@@ -1,6 +1,7 @@
 from moonshine_onnx import MoonshineOnnxModel, load_tokenizer
 from sounddevice import InputStream
 from silero_vad import VADIterator, load_silero_vad
+from typing import Callable, Optional
 from queue import Queue
 
 import numpy as np
@@ -37,9 +38,15 @@ class Transcriber:
 
 
 class SpeechRecognition:
-    def __init__(self, model_name="moonshine/tiny"):
-        print(f"Loading Moonshine model '{model_name}' (ONNX) ...")
+    def __init__(
+        self,
+        model_name="moonshine/tiny",
+        callback: Optional[Callable[[str], None]] = None,
+    ):
         self.model_name = model_name
+        self.callback = callback
+
+        print(f"Loading Moonshine model '{model_name}' (ONNX) ...")
         self.transcriber = Transcriber(model_name)
         self.vad_model = load_silero_vad(onnx=True)
         self.vad_iterator = VADIterator(
@@ -117,7 +124,10 @@ class SpeechRecognition:
                     self.end_recording()
                     self.soft_reset_vad()
                 if (time.time() - self._start_time) > MIN_REFRESH_SECS:
-                    self.print_captions_line(self.transcriber(self.speech))
+                    translation = self.transcriber(self.speech)
+                    if self.callback:
+                        self.callback(translation)
+                    self.print_captions_line(translation)
                     self._start_time = time.time()
 
     def stop(self):
@@ -141,11 +151,26 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+translation_count = 0
+
+
+def callback(text: str):
+    global translation_count
+    translation_count += 1
+
+
+def main():
     args = parse_args()
-    sr = SpeechRecognition(args.model)
+
+    sr = SpeechRecognition(args.model, callback)
+
     try:
         sr.run()
     except KeyboardInterrupt:
         sr.stop()
         print(f"\n{sr.get_caption()}")
+        print(f"{translation_count} translation times")
+
+
+if __name__ == "__main__":
+    main()
