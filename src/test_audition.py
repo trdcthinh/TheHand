@@ -1,8 +1,10 @@
-from audition.audition import Audition
+from thehand.engine.audition import Audition
+from thehand.engine.state import StateManager
 
 
 def main():
-    audition = Audition()
+    state = StateManager()
+    audition = Audition(state)
     audition()
 
 

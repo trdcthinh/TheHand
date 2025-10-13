@@ -21,3 +21,8 @@ invalid-argument-type = "ignore"
 
 [tool.uv.sources]
 useful-moonshine-onnx = { git = "https://github.com/moonshine-ai/moonshine.git", subdirectory = "moonshine-onnx" }
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.0",
+]

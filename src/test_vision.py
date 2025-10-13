@@ -1,8 +1,12 @@
-from vision.vision import Vision
+from thehand.engine.vision import Vision
+from thehand.engine.state import StateManager
 
 
 def main():
-    vision = Vision(True)
+    state = StateManager()
+    state.debug_mode = True
+
+    vision = Vision(state)
     vision()
 
 
