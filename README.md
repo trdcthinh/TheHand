@@ -39,13 +39,41 @@ To make this unique control system work, the project uses specialized Machine Le
 
 ## For Devs
 
-To start developing:
+### Getting Started
 
 - Install `uv`.
-- Clone the repo and run
+- Clone the repo:
+
+```bash
+git clone https://github.com/TheHand-FPT/TheHand.git
+```
+
+```bash
+cd TheHand
+```
+
+- Sync virtual env:
 
 ```bash
 uv sync
 ```
 
-- You are ready to go.
+- Install package as editable:
+
+```bash
+uv pip install -e .
+```
+
+Now you are ready to go!
+
+### A quick look
+
+Just run any script in `showcase/` to see how it work:
+
+```bash
+uv run showcase/show_audition.py
+```
+
+```bash
+uv run showcase/show_game_dev.py
+```
