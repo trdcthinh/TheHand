@@ -1,15 +1,18 @@
 import numpy as np
 
 from thehand.engine.enums import Command
+from thehand.engine.state import StateManager
 from thehand.engine.vision.hand.hand_landmarker import HandLandmarker
 from thehand.engine.vision.hand.hand_processor import HandProcessor
 
 
 class Hand:
-    def __init__(self, draw: bool = False):
-        self.draw = draw
+    def __init__(self, state: StateManager):
+        self.state: StateManager = (
+            state if isinstance(state, StateManager) else StateManager()
+        )
 
-        self._landmarker = HandLandmarker(draw)
+        self._landmarker = HandLandmarker(self.state)
         self._processor = HandProcessor()
 
     def __call__(self, image) -> tuple[Command, np.ndarray]:

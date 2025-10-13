@@ -5,6 +5,7 @@ description = "TheHand's game project."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "auto-py-to-exe>=2.47.0",
     "imutils>=0.5.4",
     "mediapipe>=0.10.21",
     "pygame-ce>=2.5.5",

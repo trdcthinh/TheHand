@@ -1,15 +1,13 @@
-from thehand.engine.scene import Scene
-
 import pygame
+
+from thehand.engine.scene import Scene
 
 
 class OpeningScene(Scene):
-    def __init__(self, name: str):
-        super().__init__(name)
+    def __init__(self, name: str, screen: pygame.Surface):
+        super().__init__(name, screen)
 
-        self.font = pygame.font.Font(None, 36)
-
-    def handle_events(self, event):
+    def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.K_ESCAPE:
                 pygame.quit()
@@ -17,4 +15,4 @@ class OpeningScene(Scene):
 
     def render(self):
         self.screen.fill((0, 0, 0))
-        self.screen.flip()
+        pygame.display.flip()

@@ -12,13 +12,14 @@ from thehand.engine.vision.pose.pose import Pose
 
 
 class Vision:
-    def __init__(self, state_manager: StateManager):
-        self.state_manager = state_manager
+    def __init__(self, state: StateManager | None = None):
+        self.state: StateManager = (
+            state if isinstance(state, StateManager) else StateManager()
+        )
 
-        self.draw = False if not state_manager else state_manager.debug_mode
-        self.hand = Hand(self.draw)
-        self.face = Face(self.draw)
-        self.pose = Pose(self.draw)
+        self.hand: Hand = Hand(self.state)
+        self.face: Face = Face(self.state)
+        self.pose: Pose = Pose(self.state)
 
         self.commands: list[Command] = []
 
@@ -43,7 +44,7 @@ class Vision:
             face_command, face_image = self.face(image.copy())
             pose_command, pose_image = self.pose(image.copy())
 
-            if self.draw:
+            if self.state.debug_mode:
                 row = imutils.resize(
                     cv2.hconcat([hand_image, pose_image]), configs.FRAME_SIZE[0]
                 )

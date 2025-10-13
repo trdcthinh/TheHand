@@ -3,13 +3,13 @@ from threading import Thread
 
 from thehand.engine.audition.speech_recognition import SpeechRecognition
 from thehand.engine.audition.text_processor import TextProcessor
-from thehand.engine.state import StateManager
 from thehand.engine.enums import Command
+from thehand.engine.state import StateManager
 
 
 class Audition:
-    def __init__(self, state_manager: StateManager):
-        self.state_manager = state_manager
+    def __init__(self, state: StateManager):
+        self.state = state
 
         self.sr = SpeechRecognition(callback=self.callback)
         self.processor = TextProcessor()

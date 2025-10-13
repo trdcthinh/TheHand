@@ -1,3 +1,5 @@
+import pygame
+
 from thehand.engine.entity.entity_manager import EntityManager
 from thehand.engine.scene.renderer import Renderer
 from thehand.engine.scene.scene_state import SceneState
@@ -11,8 +13,9 @@ class Scene:
     Each hold its unique SceneState, EntityManager but not necessarily Updater and Renderer.
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, screen: pygame.Surface):
         self.name = name
+        self.screen = screen
 
         self.state = SceneState()
         self.entity = EntityManager()

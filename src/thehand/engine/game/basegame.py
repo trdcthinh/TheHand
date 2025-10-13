@@ -1,5 +1,7 @@
 from threading import Thread
 
+import pygame
+
 from thehand.engine.audition import Audition
 from thehand.engine.scene import SceneManager
 from thehand.engine.state import StateManager
@@ -8,24 +10,14 @@ from thehand.engine.vision import Vision
 
 class BaseGame:
     def __init__(self):
-        self.state_manager = StateManager()
-        self.have_setup = False
+        pygame.init()
 
-        self.scene_manager: SceneManager = None
-        self.audition: Audition = None
-        self.vision: Vision = None
-
-    def setup(self) -> None:
-        if self.have_setup:
-            return None
-
-        self.scene_manager = SceneManager()
-        self.audition = Audition(self.state_manager)
-        self.vision = Vision(self.state_manager)
+        self.state: StateManager = StateManager()
+        self.scene_manager: SceneManager = SceneManager()
+        self.audition: Audition = Audition(self.state)
+        self.vision: Vision = Vision(self.state)
 
     def run(self):
-        self.setup()
-
         audition_thread = Thread(target=self._run_audition, daemon=True)
         audition_thread.start()
 

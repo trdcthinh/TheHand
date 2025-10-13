@@ -1,7 +1,7 @@
 import argparse
 import time
 from queue import Queue
-from typing import Callable, Optional
+from typing import Callable, Literal, Optional
 
 import numpy as np
 from moonshine_onnx import MoonshineOnnxModel, load_tokenizer
@@ -39,14 +39,14 @@ class Transcriber:
 class SpeechRecognition:
     def __init__(
         self,
-        model_name="moonshine/tiny",
+        model: Literal["moonshine/tiny", "moonshine/base"] = "moonshine/base",
         callback: Optional[Callable[[str], None]] = None,
     ):
-        self.model_name = model_name
+        self.model = model
         self.callback = callback
 
-        print(f"Loading Moonshine model '{model_name}' (ONNX) ...")
-        self.transcriber = Transcriber(model_name)
+        print(f"Loading Moonshine model '{model}' (ONNX) ...")
+        self.transcriber = Transcriber(model)
         self.vad_model = load_silero_vad(onnx=True)
         self.vad_iterator = VADIterator(
             model=self.vad_model,

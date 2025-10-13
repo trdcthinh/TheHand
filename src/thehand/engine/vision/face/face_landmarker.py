@@ -7,10 +7,14 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.python.solutions import drawing_styles, drawing_utils, face_mesh
 from mediapipe.tasks.python import BaseOptions, vision
 
+from thehand.engine.state import StateManager
+
 
 class FaceLandmarker:
-    def __init__(self, draw: bool = False):
-        self.draw = draw
+    def __init__(self, state: StateManager):
+        self.state: StateManager = (
+            state if isinstance(state, StateManager) else StateManager()
+        )
 
         self.model = "models/face_landmarker.task"
         self.num_faces = 1
@@ -40,7 +44,7 @@ class FaceLandmarker:
 
         self.landmarker.detect_async(mp_image, time.time_ns() // 1_000_000)
 
-        if self.draw:
+        if self.state.debug_mode:
             self.draw_fps(image)
             self.draw_faces(image)
             image = self.draw_blendshapes(image)

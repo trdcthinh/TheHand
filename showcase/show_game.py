@@ -1,8 +1,8 @@
-from thehand.game import ProductionGame
+from thehand.game import ThehandGame
 
 
 def main():
-    game = ProductionGame()
+    game = ThehandGame()
     game.run()
 
 
