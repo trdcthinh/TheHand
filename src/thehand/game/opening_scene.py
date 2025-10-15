@@ -1,6 +1,6 @@
 import pygame
 
-from thehand.engine.scene import Scene
+from thehand.core.scene import Scene
 
 
 class OpeningScene(Scene):

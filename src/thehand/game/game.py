@@ -1,4 +1,4 @@
-from thehand.engine import BaseGame
+from thehand.core import BaseGame
 from thehand.game.opening_scene import OpeningScene
 
 

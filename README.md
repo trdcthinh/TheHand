@@ -28,7 +28,7 @@ To make this unique control system work, the project uses specialized Machine Le
 ## Development Team (TheHand)
 
 | Name            | Student ID |
-| :-------------- | :--------- |
+|:----------------|:-----------|
 | Trần Đức Thịnh  | HE201309   |
 | Châm Duy Khoát  | HE204140   |
 | Nguyễn Thế Anh  | HE204320   |
@@ -68,7 +68,7 @@ Now you are ready to go!
 
 ### A quick look
 
-Just run any script in `showcase/` to see how it work:
+Just run any script in `showcase/` to see how it works:
 
 ```bash
 uv run showcase/show_audition.py

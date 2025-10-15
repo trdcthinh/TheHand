@@ -1,4 +1,4 @@
-from thehand.engine.scene import SceneManager
+from thehand.core.scene import SceneManager
 
 
 def main():
