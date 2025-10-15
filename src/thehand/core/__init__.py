@@ -6,3 +6,4 @@ from thehand.core.game import Game as Game
 from thehand.core.scene import Scene as Scene
 from thehand.core.scene import SceneManager as SceneManager
 from thehand.core.state import State as State
+from thehand.core.vision import Vision as Vision

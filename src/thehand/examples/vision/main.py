@@ -1,4 +1,4 @@
-from thehand.core.vision import Vision
+from thehand.core import Vision
 
 
 def main():

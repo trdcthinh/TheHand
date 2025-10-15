@@ -28,6 +28,9 @@ class SceneManager:
 
             self.clock.tick(self.state.FPS)
 
+            if self.current_scene.done:
+                self.next()
+
     def run(self, scene: str) -> None:
         if not self.scenes.get(scene):
             raise NameError(f'Scene "{scene}" not found!')

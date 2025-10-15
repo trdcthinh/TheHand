@@ -12,6 +12,7 @@ class BasicScene(Scene):
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 print("next")
+                self.done = True
         pass
 
     def update(self):

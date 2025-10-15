@@ -18,6 +18,7 @@ class Scene(ABC):
         self.state: State = state
 
         self.next_scene: Self | None = None
+        self.done: bool = False
 
     @abstractmethod
     def setup(self) -> None:
