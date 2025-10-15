@@ -7,14 +7,12 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.python.solutions import drawing_styles, drawing_utils, pose
 from mediapipe.tasks.python import BaseOptions, vision
 
-from thehand.core.state import StateManager
+from thehand.core.state import State
 
 
 class PoseLandmarker:
-    def __init__(self, state: StateManager):
-        self.state: StateManager = (
-            state if isinstance(state, StateManager) else StateManager()
-        )
+    def __init__(self, state: State):
+        self.state: State = state if isinstance(state, State) else State()
 
         self.model = "models/pose_landmarker.task"
         self.num_poses = 1
@@ -26,9 +24,9 @@ class PoseLandmarker:
         self.detection_result = None
         self.fps_avg_frame_count = 10
 
-        base_options = BaseOptions(model_asset_path=self.model)
+        options = BaseOptions(model_asset_path=self.model)
         options = vision.PoseLandmarkerOptions(
-            base_options=base_options,
+            options=options,
             running_mode=vision.RunningMode.LIVE_STREAM,
             num_poses=self.num_poses,
             output_segmentation_masks=self.output_segmentation_masks,

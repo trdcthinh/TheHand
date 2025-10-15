@@ -7,14 +7,12 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.python.solutions import drawing_styles, drawing_utils, face_mesh
 from mediapipe.tasks.python import BaseOptions, vision
 
-from thehand.core.state import StateManager
+from thehand.core.state import State
 
 
 class FaceLandmarker:
-    def __init__(self, state: StateManager | None = None):
-        self.state: StateManager = (
-            state if isinstance(state, StateManager) else StateManager()
-        )
+    def __init__(self, state: State | None = None):
+        self.state: State = state if isinstance(state, State) else State()
 
         self.model = "models/face_landmarker.task"
         self.num_faces = 1
@@ -28,9 +26,9 @@ class FaceLandmarker:
 
         self.label_padding_width = 500
 
-        base_options = BaseOptions(model_asset_path=self.model)
+        options = BaseOptions(model_asset_path=self.model)
         options = vision.FaceLandmarkerOptions(
-            base_options=base_options,
+            options=options,
             running_mode=vision.RunningMode.LIVE_STREAM,
             num_faces=self.num_faces,
             output_face_blendshapes=self.output_face_blendshapes,

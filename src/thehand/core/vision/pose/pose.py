@@ -1,16 +1,14 @@
 import numpy as np
 
 from thehand.core.enums import Command
-from thehand.core.state import StateManager
+from thehand.core.state import State
 from thehand.core.vision.pose.pose_landmarker import PoseLandmarker
 from thehand.core.vision.pose.pose_processor import PoseProcessor
 
 
 class Pose:
-    def __init__(self, state: StateManager):
-        self.state: StateManager = (
-            state if isinstance(state, StateManager) else StateManager()
-        )
+    def __init__(self, state: State):
+        self.state: State = state if isinstance(state, State) else State()
 
         self._landmarker = PoseLandmarker(self.state)
         self._processor = PoseProcessor()

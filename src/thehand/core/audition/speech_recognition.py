@@ -7,14 +7,17 @@ from moonshine_onnx import MoonshineOnnxModel, load_tokenizer
 from silero_vad import VADIterator, load_silero_vad
 from sounddevice import InputStream
 
-from thehand.core.state import StateManager
+from thehand.core.configs import (
+    CHUNK_SIZE,
+    DEFAULT_MOONSHINE,
+    LOOKBACK_CHUNKS,
+    MAX_SPEECH_SECS,
+    MIN_REFRESH_SECS,
+    SAMPLING_RATE,
+)
+from thehand.core.state import State
 
-SAMPLING_RATE = 16000
-CHUNK_SIZE = 512
-LOOKBACK_CHUNKS = 5
 MAX_LINE_LENGTH = 80
-MAX_SPEECH_SECS = 15
-MIN_REFRESH_SECS = 0.2
 
 
 class Transcriber:
@@ -40,15 +43,13 @@ class Transcriber:
 class SpeechRecognition:
     def __init__(
         self,
-        model: Literal["moonshine/tiny", "moonshine/base"] = "moonshine/base",
-        result_callback: Optional[Callable[[str], None]] = None,
-        state: StateManager | None = None,
-    ):
+        model: Literal["moonshine/tiny", "moonshine/base"] = DEFAULT_MOONSHINE,
+        result_callback: Callable[[str], None] | None = None,
+        state: State | None = None,
+    ) -> None:
         self.model = model
         self.result_callback: Optional[Callable[[str], None]] = result_callback
-        self.state: StateManager = (
-            state if isinstance(state, StateManager) else StateManager()
-        )
+        self.state: State = state if isinstance(state, State) else State()
 
         if self.state.debug_mode:
             print(f"Loading Moonshine model '{model}' (ONNX) ...")
@@ -74,7 +75,6 @@ class SpeechRecognition:
         self.lookback_size = LOOKBACK_CHUNKS * CHUNK_SIZE
         self.speech = np.empty(0, dtype=np.float32)
         self.recording = False
-        self._running = False
         self._start_time = None
 
     def get_caption(self):
@@ -82,6 +82,8 @@ class SpeechRecognition:
 
     def end_recording(self, do_print=True):
         text = self.transcriber(self.speech)
+        if self.result_callback:
+            self.result_callback(text)
         if self.state.debug_mode and do_print:
             self.print_captions_line(text)
         self.caption_cache.append(text)
@@ -108,8 +110,8 @@ class SpeechRecognition:
         if self.state.debug_mode:
             self.print_captions_line("Ready...")
         self.stream.start()
-        self._running = True
-        while self._running:
+        self.state.sr_running = True
+        while self.state.sr_running:
             chunk, status = self.q.get()
             if status:
                 print(status)
@@ -138,7 +140,7 @@ class SpeechRecognition:
                     self._start_time = time.time()
 
     def stop(self):
-        self._running = False
+        self.state.sr_running = False
         self.stream.close()
         if self.recording:
             while not self.q.empty():

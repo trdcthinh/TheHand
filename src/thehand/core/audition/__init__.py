@@ -1,7 +1,5 @@
-from thehand.core.audition.base_audition import BaseAudition as BaseAudition
-from thehand.core.audition.base_text_processor import (
-    BaseTextProcessor as BaseTextProcessor,
-)
+from thehand.core.audition.audition import Audition as Audition
 from thehand.core.audition.speech_recognition import (
     SpeechRecognition as SpeechRecognition,
 )
+from thehand.core.audition.text_processor import TextProcessor as TextProcessor

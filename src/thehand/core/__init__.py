@@ -1,1 +1,8 @@
-from thehand.core.game import BaseGame as BaseGame
+from thehand.core.audition import Audition as Audition
+from thehand.core.audition import SpeechRecognition as SpeechRecognition
+from thehand.core.audition import TextProcessor as TextProcessor
+from thehand.core.entity import Entity as Entity
+from thehand.core.game import Game as Game
+from thehand.core.scene import Scene as Scene
+from thehand.core.scene import SceneManager as SceneManager
+from thehand.core.state import State as State

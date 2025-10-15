@@ -1,8 +1,9 @@
-from thehand.core import BaseGame
 from thehand.game.opening_scene import OpeningScene
 
+from thehand.core import Game
 
-class ThehandGame(BaseGame):
+
+class ThehandGame(Game):
     def __init__(self):
         super().__init__()
 

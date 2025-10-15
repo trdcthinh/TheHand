@@ -1,18 +1,12 @@
 import pygame
 
 from thehand.core.scene.scene import Scene
-from thehand.core.state import StateManager
+from thehand.core.state import State
 
 
 class SceneManager:
-    """
-    Manage scenes.
-    Run only one scene at a time.
-    Do scene operations: add, remove, reload, next, previous and handle transition.
-    """
-
-    def __init__(self, state: StateManager | None = None) -> None:
-        self.state: StateManager = state if isinstance(state, StateManager) else StateManager()
+    def __init__(self, state: State | None = None) -> None:
+        self.state: State = state if isinstance(state, State) else State()
 
         self.scenes: dict[str, Scene] = {}
         self.current_scene: Scene | None = None
@@ -20,32 +14,27 @@ class SceneManager:
         self.screen = pygame.display.set_mode((1280, 720))
         self.clock = pygame.time.Clock()
 
-    def run(self):
+    def __call__(self):
+        if len(self.scenes) == 0:
+            raise IndexError("No scene!")
+
         if not self.current_scene:
-            raise AttributeError("No scene selected")
+            raise AttributeError("No current scene")
 
-        self.current_scene.handle_events()
-        self.current_scene.update()
-        self.current_scene.render()
+        while self.current_scene:
+            self.current_scene.handle_events()
+            self.current_scene.update()
+            self.current_scene.render()
 
-        self.clock.tick(self.state.FPS)
+            self.clock.tick(self.state.FPS)
 
-    def set_current_scene(self, name: str) -> None:
-        if not self.scenes.get(name):
-            raise NameError(f'Scene "{name}" not found!')
-        self.current_scene = self.scenes[name]
+    def run(self, scene: str) -> None:
+        if not self.scenes.get(scene):
+            raise NameError(f'Scene "{scene}" not found!')
+        self.current_scene: Scene = self.scenes[scene]
 
     def add(self, scene: Scene) -> None:
         self.scenes[scene.name] = scene
 
-    def remove(self, name: str) -> None:
-        del self.scenes[name]
-
-    def reload(self) -> None:
-        pass
-
     def next(self) -> None:
-        pass
-
-    def prev(self) -> None:
-        pass
+        self.current_scene = self.current_scene.next_scene

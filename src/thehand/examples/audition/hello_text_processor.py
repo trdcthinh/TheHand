@@ -1,7 +1,7 @@
-from thehand.core.audition import BaseTextProcessor
+from thehand.core.audition import TextProcessor
 
 
-class HelloTextProcessor(BaseTextProcessor):
+class HelloTextProcessor(TextProcessor):
     def result_callback(self, result: bool) -> None:
         print(f"You just said {result} that contain 'hello'")
 
@@ -10,5 +10,5 @@ class HelloTextProcessor(BaseTextProcessor):
             return True
         return False
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()

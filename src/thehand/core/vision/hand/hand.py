@@ -1,16 +1,14 @@
 import numpy as np
 
 from thehand.core.enums import Command
-from thehand.core.state import StateManager
+from thehand.core.state import State
 from thehand.core.vision.hand.hand_landmarker import HandLandmarker
 from thehand.core.vision.hand.hand_processor import HandProcessor
 
 
 class Hand:
-    def __init__(self, state: StateManager):
-        self.state: StateManager = (
-            state if isinstance(state, StateManager) else StateManager()
-        )
+    def __init__(self, state: State):
+        self.state: State = state if isinstance(state, State) else State()
 
         self._landmarker = HandLandmarker(self.state)
         self._processor = HandProcessor()

@@ -1,42 +1,44 @@
+from abc import ABC, abstractmethod
+from typing import Self
+
 import pygame
 
-from thehand.core.entity.entity_manager import EntityManager
-from thehand.core.scene.renderer import Renderer
-from thehand.core.scene.scene_state import SceneState
-from thehand.core.scene.updater import Updater
+from thehand.core.state import State
 
 
-class Scene:
-    """
-    Building block of the game.
-    A game can have many Scene managed by SceneManager.
-    Each hold its unique SceneState, EntityManager but not necessarily Updater and Renderer.
-    """
-
-    def __init__(self, name: str, screen: pygame.Surface):
-        self.name = name
+class Scene(ABC):
+    def __init__(
+        self,
+        name: str,
+        screen: pygame.Surface,
+        state: State,
+    ) -> None:
+        self.name: str = name
         self.screen = screen
+        self.state: State = state
 
-        self.state = SceneState()
-        self.entity = EntityManager()
+        self.next_scene: Self | None = None
 
-        self.updater = Updater(self.state, self.entity)
-        self.renderer = Renderer(self.state, self.entity)
-        pass
+    @abstractmethod
+    def setup(self) -> None:
+        raise NotImplementedError
 
-    def setup(self):
-        pass
-
+    @abstractmethod
     def handle_events(self) -> None:
-        pass
+        raise NotImplementedError
 
-    def update(self):
-        self.updater()
-        pass
+    @abstractmethod
+    def update(self) -> None:
+        raise NotImplementedError
 
-    def render(self):
-        self.renderer()
-        pass
+    @abstractmethod
+    def render(self) -> None:
+        raise NotImplementedError
 
-    def cleanup(self):
-        pass
+    @abstractmethod
+    def cleanup(self) -> None:
+        raise NotImplementedError
+
+    def __rshift__(self, other: Self) -> Self:
+        self.next_scene = other
+        return other

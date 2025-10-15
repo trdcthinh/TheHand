@@ -1,13 +1,13 @@
 import numpy as np
 
 from thehand.core.enums import Command
-from thehand.core.state import StateManager
+from thehand.core.state import State
 from thehand.core.vision.face.face_landmarker import FaceLandmarker
 from thehand.core.vision.face.face_processor import FaceProcessor
 
 
 class Face:
-    def __init__(self, state: StateManager):
+    def __init__(self, state: State):
         self.state = state
 
         self._landmarker = FaceLandmarker(self.state)
