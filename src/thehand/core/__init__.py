@@ -1,8 +1,12 @@
 from thehand.core.audition import Audition as Audition
 from thehand.core.audition import SpeechRecognition as SpeechRecognition
-from thehand.core.audition import TextProcessor as TextProcessor
 from thehand.core.entity import Entity as Entity
 from thehand.core.game import Game as Game
 from thehand.core.scene import Scene as Scene
 from thehand.core.scene import SceneManager as SceneManager
 from thehand.core.state import State as State
+from thehand.core.vision import Camera as Camera
+from thehand.core.vision import FaceLandmarker as FaceLandmarker
+from thehand.core.vision import HandLandmarker as HandLandmarker
+from thehand.core.vision import PoseLandmarker as PoseLandmarker
+from thehand.core.vision import Vision as Vision

@@ -1,22 +1,20 @@
 import time
 from queue import Queue
-from typing import Callable, Literal, Optional
 
 import numpy as np
 from moonshine_onnx import MoonshineOnnxModel, load_tokenizer
 from silero_vad import VADIterator, load_silero_vad
 from sounddevice import InputStream
 
-from thehand.core.configs import (
-    CHUNK_SIZE,
-    DEFAULT_MOONSHINE,
-    LOOKBACK_CHUNKS,
-    MAX_SPEECH_SECS,
-    MIN_REFRESH_SECS,
-    SAMPLING_RATE,
-)
 from thehand.core.state import State
+from thehand.core.types import SrResultCallback
 
+DEFAULT_MODEL = "moonshine/tiny"
+SAMPLING_RATE = 16000
+CHUNK_SIZE = 512
+LOOKBACK_CHUNKS = 5
+MAX_SPEECH_SECS = 10
+MIN_REFRESH_SECS = 0.2
 MAX_LINE_LENGTH = 80
 
 
@@ -25,9 +23,9 @@ class Transcriber:
         self.model = MoonshineOnnxModel(model_name=model_name)
         self.rate = SAMPLING_RATE
         self.tokenizer = load_tokenizer()
-        self.inference_secs = 0
+        self.inference_secs: float = 0
         self.number_inferences = 0
-        self.speech_secs = 0
+        self.speech_secs: float = 0
         self.__call__(np.zeros(self.rate, dtype=np.float32))
 
     def __call__(self, speech):
@@ -42,18 +40,16 @@ class Transcriber:
 
 class SpeechRecognition:
     def __init__(
-        self,
-        model: Literal["moonshine/tiny", "moonshine/base"] = DEFAULT_MOONSHINE,
-        result_callback: Callable[[str], None] | None = None,
-        state: State | None = None,
+        self, state: State, result_callback: SrResultCallback | None = None
     ) -> None:
-        self.model = model
-        self.result_callback: Optional[Callable[[str], None]] = result_callback
-        self.state: State = state if isinstance(state, State) else State()
+        self.state = state
+        self.result_callback = result_callback
+
+        self.model = DEFAULT_MODEL
 
         if self.state.debug_mode:
-            print(f"Loading Moonshine model '{model}' (ONNX) ...")
-        self.transcriber = Transcriber(model)
+            print(f"Loading Moonshine model '{self.model}' (ONNX) ...")
+        self.transcriber = Transcriber(self.model)
         self.vad_model = load_silero_vad(onnx=True)
         self.vad_iterator = VADIterator(
             model=self.vad_model,
@@ -75,7 +71,10 @@ class SpeechRecognition:
         self.lookback_size = LOOKBACK_CHUNKS * CHUNK_SIZE
         self.speech = np.empty(0, dtype=np.float32)
         self.recording = False
-        self._start_time = None
+        self._start_time: float = 0
+
+    def set_result_callback(self, callback: SrResultCallback) -> None:
+        self.result_callback = callback
 
     def get_caption(self):
         return f"{' '.join(self.caption_cache)}"

@@ -1,4 +1,4 @@
-from thehand.core.audition import SpeechRecognition
+from thehand.core import SpeechRecognition, State
 
 translation_count = 0
 translations: list[str] = []
@@ -11,8 +11,10 @@ def result_callback(text: str):
 
 
 def main():
-    sr = SpeechRecognition(result_callback=result_callback)
-    sr.state.debug_mode = True
+    state = State()
+    state.debug_mode = True
+
+    sr = SpeechRecognition(state, result_callback)
 
     try:
         sr.run()

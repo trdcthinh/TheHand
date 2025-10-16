@@ -8,10 +8,10 @@ from thehand.core.state import State
 
 class Scene(ABC):
     def __init__(
-        self,
-        name: str,
-        screen: pygame.Surface,
-        state: State,
+            self,
+            name: str,
+            screen: pygame.Surface,
+            state: State,
     ) -> None:
         self.name: str = name
         self.screen = screen
@@ -24,7 +24,7 @@ class Scene(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def handle_events(self) -> None:
+    def handle_events(self, events: list[pygame.event.Event]) -> None:
         raise NotImplementedError
 
     @abstractmethod

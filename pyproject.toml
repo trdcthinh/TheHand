@@ -15,6 +15,14 @@ dependencies = [
     "useful-moonshine-onnx",
 ]
 
+[tool.pyrefly]
+project-includes = ["**/*"]
+project-excludes = [
+    "**/node_modules",
+    "**/__pycache__",
+    '**/*venv/**\*',
+]
+
 
 [tool.ty.rules]
 unresolved-attribute = "ignore"

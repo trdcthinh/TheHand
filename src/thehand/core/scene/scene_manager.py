@@ -1,5 +1,6 @@
 import pygame
 
+from thehand.core.event import Event, EventCode
 from thehand.core.scene.scene import Scene
 from thehand.core.state import State
 
@@ -21,12 +22,37 @@ class SceneManager:
         if not self.current_scene:
             raise AttributeError("No current scene")
 
-        while self.current_scene:
-            self.current_scene.handle_events()
-            self.current_scene.update()
-            self.current_scene.render()
+        while True:
+            if not self.current_scene:
+                print("No scene!")
+                self.clock.tick(5)
+                continue
+
+            self._handle_events()
+            self._update()
+            self._render()
 
             self.clock.tick(self.state.FPS)
+
+    def _handle_events(self) -> None:
+        events = pygame.event.get()
+
+        for event in events:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit(0)
+
+            if event.type == Event.COMMAND.value:
+                if event.code == EventCode.COMMAND_NEXT_SCENE:
+                    self.next()
+
+        self.current_scene.handle_events(events)
+
+    def _update(self) -> None:
+        self.current_scene.update()
+
+    def _render(self) -> None:
+        self.current_scene.render()
 
     def run(self, scene: str) -> None:
         if not self.scenes.get(scene):
@@ -37,4 +63,9 @@ class SceneManager:
         self.scenes[scene.name] = scene
 
     def next(self) -> None:
+        if not self.current_scene or not self.current_scene.next_scene:
+            print("End game!")
+            pygame.quit()
+            exit(0)
+
         self.current_scene = self.current_scene.next_scene

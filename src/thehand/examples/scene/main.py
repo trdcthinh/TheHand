@@ -1,8 +1,9 @@
 import pygame
 
 from thehand.core import SceneManager, State
-from thehand.core.configs import DEFAULT_WINDOW_SIZE
 from thehand.examples.scene.basic_scene import BasicScene
+
+DEFAULT_WINDOW_SIZE: tuple[int, int] = (1280, 720)
 
 
 def main():
@@ -15,7 +16,6 @@ def main():
     state = State()
     state.debug_mode = True
 
-    scene_manager = SceneManager(state)
     scene_manager = SceneManager(state)
 
     scene1 = BasicScene("scene1", screen, state)

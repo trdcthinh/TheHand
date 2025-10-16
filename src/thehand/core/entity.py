@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-from thehand.core.configs import COLOR_PINK
+COLOR_PINK = (255, 0, 255)
 
 
 class Entity(ABC):

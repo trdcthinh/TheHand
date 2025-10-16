@@ -1,16 +1,24 @@
-from thehand.core.audition import Audition
-from thehand.core.state import State
-from thehand.examples.audition.hello_text_processor import HelloTextProcessor
+from thehand.core import Audition, State
+
+
+def example_sr_result_callback(text: str) -> None:
+    print(f"{text} (*/ω＼*)")
 
 
 class HelloAudition(Audition):
-    def sr_result_callback(self, text: str) -> None:
-        result = self.hello_text_processor(text)
-        if result:
-            print("(*/ω＼*)")
-        return None
-
-    def __init__(self, state: State | None = None) -> None:
+    def __init__(self, state: State) -> None:
         super().__init__(state)
 
-        self.hello_text_processor: HelloTextProcessor = HelloTextProcessor()
+        self.sr.set_result_callback(example_sr_result_callback)
+
+
+def main():
+    state = State()
+    state.debug_mode = True
+
+    audition = HelloAudition(state)
+    audition()
+
+
+if __name__ == "__main__":
+    main()
