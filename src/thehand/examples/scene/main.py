@@ -25,7 +25,7 @@ def main():
     scene_manager.add(scene1)
     scene_manager.add(scene2)
     scene_manager.add(scene3)
-    scene_manager.run("scene1")
+    scene_manager.set_current("scene1")
 
     scene1 >> scene2 >> scene3
 

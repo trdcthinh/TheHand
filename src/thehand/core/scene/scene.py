@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Self
 
 import pygame
 
@@ -17,11 +16,7 @@ class Scene(ABC):
         self.screen = screen
         self.state: State = state
 
-        self.next_scene: Self | None = None
-
-    @abstractmethod
-    def setup(self) -> None:
-        raise NotImplementedError
+        self.next_scene: 'Scene | None' = None
 
     @abstractmethod
     def handle_events(self, events: list[pygame.event.Event]) -> None:
@@ -35,10 +30,6 @@ class Scene(ABC):
     def render(self) -> None:
         raise NotImplementedError
 
-    @abstractmethod
-    def cleanup(self) -> None:
-        raise NotImplementedError
-
-    def __rshift__(self, other: Self) -> Self:
+    def __rshift__(self, other: 'Scene') -> 'Scene':
         self.next_scene = other
         return other

@@ -23,18 +23,11 @@ class Transcriber:
         self.model = MoonshineOnnxModel(model_name=model_name)
         self.rate = SAMPLING_RATE
         self.tokenizer = load_tokenizer()
-        self.inference_secs: float = 0
-        self.number_inferences = 0
-        self.speech_secs: float = 0
         self.__call__(np.zeros(self.rate, dtype=np.float32))
 
     def __call__(self, speech):
-        self.number_inferences += 1
-        self.speech_secs += len(speech) / self.rate
-        start_time = time.time()
         tokens = self.model.generate(speech[np.newaxis, :].astype(np.float32))
         text = self.tokenizer.decode_batch(tokens)[0]
-        self.inference_secs += time.time() - start_time
         return text
 
 
@@ -47,9 +40,9 @@ class SpeechRecognition:
 
         self.model = DEFAULT_MODEL
 
-        if self.state.debug_mode:
-            print(f"Loading Moonshine model '{self.model}' (ONNX) ...")
+        print(f"Loading Moonshine model '{self.model}' ...")
         self.transcriber = Transcriber(self.model)
+        print("Moonshine model loaded.")
         self.vad_model = load_silero_vad(onnx=True)
         self.vad_iterator = VADIterator(
             model=self.vad_model,
@@ -67,7 +60,7 @@ class SpeechRecognition:
                 (data.copy().flatten(), status)
             ),
         )
-        self.caption_cache = []
+        self.captions = []
         self.lookback_size = LOOKBACK_CHUNKS * CHUNK_SIZE
         self.speech = np.empty(0, dtype=np.float32)
         self.recording = False
@@ -77,28 +70,14 @@ class SpeechRecognition:
         self.result_callback = callback
 
     def get_caption(self):
-        return f"{' '.join(self.caption_cache)}"
+        return " ".join(self.captions)
 
-    def end_recording(self, do_print=True):
+    def end_recording(self):
         text = self.transcriber(self.speech)
         if self.result_callback:
             self.result_callback(text)
-        if self.state.debug_mode and do_print:
-            self.print_captions_line(text)
-        self.caption_cache.append(text)
+        self.captions.append(text)
         self.speech *= 0.0
-
-    def print_captions_line(self, text):
-        if len(text) < MAX_LINE_LENGTH:
-            for caption in self.caption_cache[::-1]:
-                text = caption + " | " + text
-                if len(text) > MAX_LINE_LENGTH:
-                    break
-        if len(text) > MAX_LINE_LENGTH:
-            text = text[-MAX_LINE_LENGTH:]
-        else:
-            text = " " * (MAX_LINE_LENGTH - len(text)) + text
-        print("\r" + (" " * MAX_LINE_LENGTH) + "\r" + text, end="", flush=True)
 
     def soft_reset_vad(self):
         self.vad_iterator.triggered = False
@@ -106,11 +85,15 @@ class SpeechRecognition:
         self.vad_iterator.current_sample = 0
 
     def run(self):
-        if self.state.debug_mode:
-            self.print_captions_line("Ready...")
+        print("Speech Recognition ready.")
         self.stream.start()
         self.state.sr_running = True
-        while self.state.sr_running:
+
+        while True:
+            if not self.state.sr_running:
+                time.sleep(0.2)
+                continue
+
             chunk, status = self.q.get()
             if status:
                 print(status)
@@ -134,15 +117,12 @@ class SpeechRecognition:
                     translation = self.transcriber(self.speech)
                     if self.result_callback:
                         self.result_callback(translation)
-                    if self.state.debug_mode:
-                        self.print_captions_line(translation)
                     self._start_time = time.time()
 
     def stop(self):
-        self.state.sr_running = False
         self.stream.close()
         if self.recording:
             while not self.q.empty():
                 chunk, _ = self.q.get()
                 self.speech = np.concatenate((self.speech, chunk))
-            self.end_recording(do_print=False)
+            self.end_recording()

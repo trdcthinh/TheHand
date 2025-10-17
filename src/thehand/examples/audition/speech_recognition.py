@@ -8,11 +8,11 @@ def result_callback(text: str):
     global translation_count
     translation_count += 1
     translations.append(text)
+    print(f"\r{' ' * 80}\r{text.rjust(80)}", end="", flush=True)
 
 
 def main():
     state = State()
-    state.debug_mode = True
 
     sr = SpeechRecognition(state, result_callback)
 

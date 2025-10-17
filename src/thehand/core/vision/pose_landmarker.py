@@ -17,7 +17,7 @@ class PoseLandmarker:
             base_options=base_options,
             running_mode=vision.RunningMode.LIVE_STREAM,
             num_poses=NUM_POSE_DETECTED,
-            result_callback=self.result_callback,
+            result_callback=self._result_callback,
         )
         self.landmarker = vision.PoseLandmarker.create_from_options(options)
 

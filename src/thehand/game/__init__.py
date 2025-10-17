@@ -1,1 +1,1 @@
-from thehand.game.game import ThehandGame as ThehandGame
+from thehand.game.game import TheHandGame as TheHandGame

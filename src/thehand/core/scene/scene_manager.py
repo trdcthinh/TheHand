@@ -1,4 +1,4 @@
-import pygame
+import pygame as pg
 
 from thehand.core.event import Event, EventCode
 from thehand.core.scene.scene import Scene
@@ -6,16 +6,15 @@ from thehand.core.state import State
 
 
 class SceneManager:
-    def __init__(self, state: State | None = None) -> None:
-        self.state: State = state if isinstance(state, State) else State()
+    def __init__(self, state: State) -> None:
+        self.state = state
 
         self.scenes: dict[str, Scene] = {}
         self.current_scene: Scene | None = None
 
-        self.screen = pygame.display.set_mode((1280, 720))
-        self.clock = pygame.time.Clock()
+        self.clock = pg.time.Clock()
 
-    def __call__(self):
+    def run(self):
         if len(self.scenes) == 0:
             raise IndexError("No scene!")
 
@@ -23,38 +22,33 @@ class SceneManager:
             raise AttributeError("No current scene")
 
         while True:
+            events = self._handle_events()
+
             if not self.current_scene:
                 print("No scene!")
                 self.clock.tick(5)
                 continue
 
-            self._handle_events()
-            self._update()
-            self._render()
+            self.current_scene.handle_events(events)
+            self.current_scene.update()
+            self.current_scene.render()
 
             self.clock.tick(self.state.FPS)
 
-    def _handle_events(self) -> None:
-        events = pygame.event.get()
+    def _handle_events(self) -> list[pg.event.Event]:
+        events = pg.event.get()
 
         for event in events:
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit(0)
+            if event.type == pg.QUIT:
+                self.state.game_running = False
 
             if event.type == Event.COMMAND.value:
                 if event.code == EventCode.COMMAND_NEXT_SCENE:
                     self.next()
 
-        self.current_scene.handle_events(events)
+        return events
 
-    def _update(self) -> None:
-        self.current_scene.update()
-
-    def _render(self) -> None:
-        self.current_scene.render()
-
-    def run(self, scene: str) -> None:
+    def set_current(self, scene: str) -> None:
         if not self.scenes.get(scene):
             raise NameError(f'Scene "{scene}" not found!')
         self.current_scene: Scene = self.scenes[scene]
@@ -64,8 +58,14 @@ class SceneManager:
 
     def next(self) -> None:
         if not self.current_scene or not self.current_scene.next_scene:
-            print("End game!")
-            pygame.quit()
-            exit(0)
+            self.state.game_running = False
+            return
 
         self.current_scene = self.current_scene.next_scene
+
+    def __add__(self, scene: Scene) -> "SceneManager":
+        self.add(scene)
+        return self
+
+    def __lshift__(self, scene: Scene) -> None:
+        self.set_current(scene.name)

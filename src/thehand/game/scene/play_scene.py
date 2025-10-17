@@ -4,7 +4,7 @@ from thehand.core import Scene, State
 from thehand.core.event import create_next_scene_event
 
 
-class BasicScene(Scene):
+class PlayScene(Scene):
     def handle_events(self, events):
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
