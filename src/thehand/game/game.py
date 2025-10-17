@@ -1,4 +1,3 @@
-import time
 from threading import Thread
 
 import pygame as pg
@@ -10,9 +9,9 @@ from thehand.core import (
     SceneManager,
     SpeechRecognition,
     State,
+    Camera,
 )
 from thehand.core.event import Event, EventCode
-from thehand.game.callbacks import sr_hello_callback
 from thehand.game.scene import OpeningScene, PlayScene
 
 
@@ -26,11 +25,22 @@ class TheHandGame:
 
         self.sr: SpeechRecognition | None = None
 
+        self.camera: Camera | None = None
         self.face: FaceLandmarker | None = None
         self.hand: HandLandmarker | None = None
         self.pose: PoseLandmarker | None = None
 
         self.screen: pg.Surface | None = None
+
+    def run_vision(self):
+        while True:
+            image = self.camera.read()
+
+            if image is None:
+                continue
+
+            self.hand(image)
+            self.clock.tick(10)
 
     def __call__(self) -> None:
         if not self.scene_manager:
@@ -41,6 +51,9 @@ class TheHandGame:
 
         sr_thread = Thread(target=self.sr.run, daemon=True)
         sr_thread.start()
+
+        vision_thread = Thread(target=self.run_vision, daemon=True)
+        vision_thread.start()
 
         while True:
             for event in pg.event.get():
@@ -68,8 +81,9 @@ class TheHandGame:
 
         self.sr = SpeechRecognition(self.state)
 
+        self.camera = Camera()
         # self.face = FaceLandmarker()
-        # self.hand = HandLandmarker()
+        self.hand = HandLandmarker()
         # self.pose = PoseLandmarker()
 
         self.screen = pg.display.set_mode(
@@ -79,7 +93,9 @@ class TheHandGame:
         self.setup_scenes()
 
     def setup_scenes(self) -> None:
-        opening_scene = OpeningScene("open", self.screen, self.state, self.sr)
+        opening_scene = OpeningScene(
+            "open", self.screen, self.state, self.sr, self.hand
+        )
         play_scene = PlayScene("play", self.screen, self.state, self.sr)
 
         opening_scene >> play_scene
