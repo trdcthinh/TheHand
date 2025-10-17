@@ -32,7 +32,7 @@ class FaceLandmarker:
         self.landmarker.detect_async(mp_image, time.time_ns() // 1_000_000)
 
     def _result_callback(
-            self, result: vision.FaceLandmarkerResult, _, timestamp_ms: int
+        self, result: vision.FaceLandmarkerResult, _, timestamp_ms: int
     ) -> None:
         if self.result_callback:
             self.result_callback(result)
