@@ -8,7 +8,9 @@ class State:
         self.debug_mode = False
         self.display_flag = pg.NOFRAME
         self.window_size = DEFAULT_WINDOW_SIZE
+
         self.FPS = 60
+        self.vision_FPS = 10
 
         self.game_running = True
 

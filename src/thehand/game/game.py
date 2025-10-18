@@ -104,7 +104,7 @@ class TheHandGame:
 
             self.hand(image)
 
-            self.vision_clock.tick(10)
+            self.vision_clock.tick(self.state.vision_FPS)
 
     def _handle_events(self) -> None:
         for event in pg.event.get():
