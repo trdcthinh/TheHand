@@ -59,19 +59,13 @@ class TheHandGame:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     print("End game!")
-                    self.sr.stop()
-                    self.scene_manager.stop()
-                    pg.quit()
-                    exit(0)
+                    self.quit()
 
                 if event.type == Event.COMMAND.value:
                     if event.code == EventCode.COMMAND_NEXT_SCENE:
                         if not self.scene_manager.current_scene.next_scene:
                             print("End game!")
-                            self.sr.stop()
-                            self.scene_manager.stop()
-                            pg.quit()
-                            exit(0)
+                            self.quit()
                         self.scene_manager.next()
 
             self.clock.tick(20)
@@ -104,6 +98,12 @@ class TheHandGame:
         self.scene_manager += play_scene
 
         self.scene_manager << opening_scene
+
+    def quit(self):
+        self.sr.stop()
+        self.scene_manager.stop()
+        pg.quit()
+        exit(0)
 
 
 def main():
