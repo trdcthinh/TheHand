@@ -20,6 +20,7 @@ class TheHandGame:
         self.state = State()
 
         self.clock = pg.Clock()
+        self.vision_clock = pg.Clock()
 
         self.scene_manager: SceneManager | None = None
 
@@ -32,27 +33,20 @@ class TheHandGame:
 
         self.screen: pg.Surface | None = None
 
-    def run_vision(self):
-        while True:
-            image = self.camera.read()
-
-            if image is None:
-                continue
-
-            self.hand(image)
-            self.clock.tick(10)
-
     def __call__(self) -> None:
         if not self.scene_manager:
-            raise TypeError("SceneManager not initialized")
+            raise TypeError("SceneManager is not initialized")
 
         scene_manager_thread = Thread(target=self.scene_manager.run, daemon=True)
         scene_manager_thread.start()
 
+        if not self.sr:
+            raise TypeError("SpeechRecognition is not initialized")
+
         sr_thread = Thread(target=self.sr.run, daemon=True)
         sr_thread.start()
 
-        vision_thread = Thread(target=self.run_vision, daemon=True)
+        vision_thread = Thread(target=self._run_vision, daemon=True)
         vision_thread.start()
 
         while True:
@@ -65,17 +59,23 @@ class TheHandGame:
         self.sr = SpeechRecognition(self.state)
 
         self.camera = Camera()
-        # self.face = FaceLandmarker()
+        self.face = FaceLandmarker()
         self.hand = HandLandmarker()
-        # self.pose = PoseLandmarker()
+        self.pose = PoseLandmarker()
 
         self.screen = pg.display.set_mode(
             self.state.window_size, self.state.display_flag
         )
 
-        self.setup_scenes()
+        self._setup_scenes()
 
-    def setup_scenes(self) -> None:
+    def quit(self) -> None:
+        self.sr.stop()
+        self.scene_manager.stop()
+        pg.quit()
+        exit(0)
+
+    def _setup_scenes(self) -> None:
         opening_scene = OpeningScene(
             "open", self.screen, self.state, self.sr, self.hand
         )
@@ -88,7 +88,25 @@ class TheHandGame:
 
         self.scene_manager << opening_scene
 
-    def _handle_events(self):
+    def _run_vision(self) -> None:
+        if not self.face:
+            raise TypeError("FaceLandmarker is not initialized")
+        if not self.hand:
+            raise TypeError("HandLandmarker is not initialized")
+        if not self.pose:
+            raise TypeError("PoseLandmarker is not initialized")
+
+        while True:
+            image = self.camera.read()
+
+            if image is None:
+                continue
+
+            self.hand(image)
+
+            self.vision_clock.tick(10)
+
+    def _handle_events(self) -> None:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 print("End game!")
@@ -100,12 +118,6 @@ class TheHandGame:
                         print("End game!")
                         self.quit()
                     self.scene_manager.next()
-
-    def quit(self):
-        self.sr.stop()
-        self.scene_manager.stop()
-        pg.quit()
-        exit(0)
 
 
 def main():
