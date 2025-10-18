@@ -34,6 +34,10 @@ class ValueNumberEventData(TypedDict):
     value: float
 
 
+def create_quit_event() -> pg.event.Event:
+    return pg.event.Event(pg.QUIT, {})
+
+
 def create_open_menu_event(message: str = "") -> pg.event.Event:
     event_data: CommandEventData = {
         "code": EventCode.COMMAND_OPEN_MENU,
