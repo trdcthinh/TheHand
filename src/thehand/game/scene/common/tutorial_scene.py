@@ -5,7 +5,7 @@ from thehand.core.event import create_next_scene_event
 from thehand.examples.callback import dislike_quit_callback, sr_next_scene_callback
 
 
-class OpeningScene(Scene):
+class TutorialScene(Scene):
     def sr_callback(self, text: str):
         self.display_text = text
         sr_next_scene_callback(text)

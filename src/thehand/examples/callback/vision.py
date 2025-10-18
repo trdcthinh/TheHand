@@ -7,10 +7,7 @@ from mediapipe.tasks.python.vision.pose_landmarker import PoseLandmarkerResult
 from thehand.core.event import create_number_event, create_quit_event
 from thehand.core.utils import print_inline
 from thehand.core.vision.utils import (
-    calculate_angle_3_point,
-    calculate_angle_vector,
-    calculate_distance,
-    match_dislike,
+    is_hand_dislike,
 )
 
 
@@ -29,7 +26,7 @@ def dislike_quit_callback(result: HandLandmarkerResult) -> None:
         if len(landmarks) < 21:
             continue
 
-        dislike = match_dislike(landmarks)
+        dislike = is_hand_dislike(landmarks)
         if dislike:
             print_inline("You dislike our game?! T_T")
             pg.event.post(create_quit_event())

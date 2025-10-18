@@ -19,4 +19,4 @@ class Camera:
             print("Camera not available")
             return None
 
-        return image
+        return cv2.flip(image, 1)

@@ -5,7 +5,7 @@ from thehand.core.event import create_next_scene_event
 from thehand.examples.callback import count_hand_callback, sr_close_callback
 
 
-class PlayScene(Scene):
+class Level02Scene(Scene):
     def sr_result_callback(self, text: str) -> None:
         sr_close_callback(text)
 

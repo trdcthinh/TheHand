@@ -12,7 +12,16 @@ from thehand.core import (
     State,
 )
 from thehand.core.event import Event, EventCode
-from thehand.game.scene import OpeningScene, PlayScene
+from thehand.game.scene import (
+    MainMenuScene,
+    CreditScene,
+    HintScene,
+    Level01Scene,
+    Level01Scene,
+    SplashScene,
+    TransitionScene,
+    TutorialScene,
+)
 
 
 class TheHandGame:
@@ -70,17 +79,17 @@ class TheHandGame:
         exit(0)
 
     def _setup_scenes(self) -> None:
-        opening_scene = OpeningScene(
+        main_menu_scene = MainMenuScene(
             "open", self.screen, self.state, self.sr, self.hand
         )
         play_scene = PlayScene("play", self.screen, self.state, self.sr, self.hand)
 
-        opening_scene >> play_scene
+        main_menu_scene >> play_scene
 
-        self.scene_manager += opening_scene
+        self.scene_manager += main_menu_scene
         self.scene_manager += play_scene
 
-        self.scene_manager << opening_scene
+        self.scene_manager << main_menu_scene
 
     def _run_vision(self) -> None:
         if not self.face:
