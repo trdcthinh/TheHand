@@ -56,18 +56,7 @@ class TheHandGame:
         vision_thread.start()
 
         while True:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    print("End game!")
-                    self.quit()
-
-                if event.type == Event.COMMAND.value:
-                    if event.code == EventCode.COMMAND_NEXT_SCENE:
-                        if not self.scene_manager.current_scene.next_scene:
-                            print("End game!")
-                            self.quit()
-                        self.scene_manager.next()
-
+            self._handle_events()
             self.clock.tick(20)
 
     def init(self) -> None:
@@ -98,6 +87,19 @@ class TheHandGame:
         self.scene_manager += play_scene
 
         self.scene_manager << opening_scene
+
+    def _handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                print("End game!")
+                self.quit()
+
+            if event.type == Event.COMMAND.value:
+                if event.code == EventCode.COMMAND_NEXT_SCENE:
+                    if not self.scene_manager.current_scene.next_scene:
+                        print("End game!")
+                        self.quit()
+                    self.scene_manager.next()
 
     def quit(self):
         self.sr.stop()
