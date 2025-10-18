@@ -35,94 +35,100 @@ class SpeechRecognition:
     def __init__(
         self, state: State, result_callback: SrResultCallback | None = None
     ) -> None:
-        self.state = state
-        self.result_callback = result_callback
+        self._state = state
+        self._result_callback = result_callback
 
-        self.model = DEFAULT_MODEL
+        self._model = DEFAULT_MODEL
 
-        print(f"Loading Moonshine model '{self.model}' ...")
-        self.transcriber = Transcriber(self.model)
+        print(f"Loading Moonshine model '{self._model}' ...")
+        self._transcriber = Transcriber(self._model)
         print("Moonshine model loaded.")
-        self.vad_model = load_silero_vad(onnx=True)
-        self.vad_iterator = VADIterator(
-            model=self.vad_model,
+
+        self._vad_model = load_silero_vad(onnx=True)
+        self._vad_iterator = VADIterator(
+            model=self._vad_model,
             sampling_rate=SAMPLING_RATE,
             threshold=0.5,
             min_silence_duration_ms=300,
         )
-        self.q = Queue()
-        self.stream = InputStream(
+
+        self._q_data = Queue()
+        self._stream = InputStream(
             samplerate=SAMPLING_RATE,
             channels=1,
             blocksize=CHUNK_SIZE,
             dtype=np.float32,
-            callback=lambda data, frames, time_, status: self.q.put(
+            callback=lambda data, frames, time_, status: self._q_data.put(
                 (data.copy().flatten(), status)
             ),
         )
+
         self.captions = []
-        self.lookback_size = LOOKBACK_CHUNKS * CHUNK_SIZE
-        self.speech = np.empty(0, dtype=np.float32)
-        self.recording = False
+
+        self._recording = False
+        self._lookback_size = LOOKBACK_CHUNKS * CHUNK_SIZE
+        self._speech = np.empty(0, dtype=np.float32)
         self._start_time: float = 0
 
     def set_result_callback(self, callback: SrResultCallback) -> None:
-        self.result_callback = callback
+        self._result_callback = callback
 
-    def get_caption(self):
-        return " ".join(self.captions)
+    def get_speech_volume(self) -> float:
+        if len(self._speech) == 0:
+            return 0.0
+        return np.sqrt(np.mean(self._speech**2))
 
-    def end_recording(self):
-        text = self.transcriber(self.speech)
-        if self.result_callback:
-            self.result_callback(text)
-        self.captions.append(text)
-        self.speech *= 0.0
-
-    def soft_reset_vad(self):
-        self.vad_iterator.triggered = False
-        self.vad_iterator.temp_end = 0
-        self.vad_iterator.current_sample = 0
-
-    def run(self):
+    def run(self) -> None:
         print("Speech Recognition ready.")
-        self.stream.start()
-        self.state.sr_running = True
+        self._stream.start()
+        self._state.sr_running = True
 
         while True:
-            if not self.state.sr_running:
+            if not self._state.sr_running:
                 time.sleep(0.2)
                 continue
 
-            chunk, status = self.q.get()
+            chunk, status = self._q_data.get()
             if status:
                 print(status)
-            self.speech = np.concatenate((self.speech, chunk))
-            if not self.recording:
-                self.speech = self.speech[-self.lookback_size :]
-            speech_dict = self.vad_iterator(chunk)
+            self._speech = np.concatenate((self._speech, chunk))
+            if not self._recording:
+                self._speech = self._speech[-self._lookback_size :]
+            speech_dict = self._vad_iterator(chunk)
             if speech_dict:
-                if "start" in speech_dict and not self.recording:
-                    self.recording = True
+                if "start" in speech_dict and not self._recording:
+                    self._recording = True
                     self._start_time = time.time()
-                if "end" in speech_dict and self.recording:
-                    self.recording = False
-                    self.end_recording()
-            elif self.recording:
-                if (len(self.speech) / SAMPLING_RATE) > MAX_SPEECH_SECS:
-                    self.recording = False
-                    self.end_recording()
-                    self.soft_reset_vad()
+                if "end" in speech_dict and self._recording:
+                    self._recording = False
+                    self._end_recording()
+            elif self._recording:
+                if (len(self._speech) / SAMPLING_RATE) > MAX_SPEECH_SECS:
+                    self._recording = False
+                    self._end_recording()
+                    self._soft_reset_vad()
                 if (time.time() - self._start_time) > MIN_REFRESH_SECS:
-                    translation = self.transcriber(self.speech)
-                    if self.result_callback:
-                        self.result_callback(translation)
+                    translation = self._transcriber(self._speech)
+                    if self._result_callback:
+                        self._result_callback(translation)
                     self._start_time = time.time()
 
-    def stop(self):
-        self.stream.close()
-        if self.recording:
-            while not self.q.empty():
-                chunk, _ = self.q.get()
-                self.speech = np.concatenate((self.speech, chunk))
-            self.end_recording()
+    def stop(self) -> None:
+        self._stream.close()
+        if self._recording:
+            while not self._q_data.empty():
+                chunk, _ = self._q_data.get()
+                self._speech = np.concatenate((self._speech, chunk))
+            self._end_recording()
+
+    def _soft_reset_vad(self) -> None:
+        self._vad_iterator.triggered = False
+        self._vad_iterator.temp_end = 0
+        self._vad_iterator.current_sample = 0
+
+    def _end_recording(self) -> None:
+        text = self._transcriber(self._speech)
+        if self._result_callback:
+            self._result_callback(text)
+        self.captions.append(text)
+        self._speech *= 0.0
