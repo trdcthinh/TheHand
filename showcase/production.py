@@ -9,6 +9,7 @@ def main():
     pg.display.set_caption("[GAME_NO_NAME]")
 
     game = TheHandGame()
+    game.init()
     game()
 
 

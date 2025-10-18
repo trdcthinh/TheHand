@@ -19,6 +19,11 @@ class Scene(ABC):
         self.next_scene: "Scene | None" = None
 
         self.have_setup = False
+        self.done = False
+
+    def __rshift__(self, other: "Scene") -> "Scene":
+        self.next_scene = other
+        return other
 
     @abstractmethod
     def setup(self) -> None:
@@ -35,7 +40,3 @@ class Scene(ABC):
     @abstractmethod
     def render(self) -> None:
         raise NotImplementedError
-
-    def __rshift__(self, other: "Scene") -> "Scene":
-        self.next_scene = other
-        return other

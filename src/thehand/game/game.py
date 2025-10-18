@@ -13,13 +13,12 @@ from thehand.core import (
 )
 from thehand.core.event import Event, EventCode
 from thehand.game.scene import (
-    MainMenuScene,
     CreditScene,
     HintScene,
     Level01Scene,
-    Level01Scene,
+    Level02Scene,
+    MainMenuScene,
     SplashScene,
-    TransitionScene,
     TutorialScene,
 )
 
@@ -72,24 +71,45 @@ class TheHandGame:
 
     def quit(self) -> None:
         self.sr.stop()
-        self.scene_manager.stop()
         pg.quit()
         print("\n\n\n" + " QUIT GAME ".center(80, "="))
         print("\n\n" + " Thank you for playing our game! ".center(80, "=") + "\n\n")
         exit(0)
 
     def _setup_scenes(self) -> None:
-        main_menu_scene = MainMenuScene(
-            "open", self.screen, self.state, self.sr, self.hand
+        splash_scene = SplashScene("splash", self.screen, self.state)
+        main_menu_scene = MainMenuScene("main_menu", self.screen, self.state)
+        tutorial_scene = TutorialScene("tutorial", self.screen, self.state)
+        hint_01_scene = HintScene("hint_01", self.screen, self.state)
+        level_01_scene = Level01Scene("level_01", self.screen, self.state)
+        hint_02_scene = HintScene("hint_02", self.screen, self.state)
+        level_02_scene = Level02Scene("level_02", self.screen, self.state)
+        credit_scene = CreditScene("credit", self.screen, self.state)
+
+        (
+            splash_scene
+            >> tutorial_scene
+            >> main_menu_scene
+            >> hint_01_scene
+            >> level_01_scene
+            >> hint_02_scene
+            >> level_02_scene
+            >> credit_scene
         )
-        play_scene = PlayScene("play", self.screen, self.state, self.sr, self.hand)
 
-        main_menu_scene >> play_scene
+        (
+            self.scene_manager
+            + splash_scene
+            + tutorial_scene
+            + main_menu_scene
+            + hint_01_scene
+            + level_01_scene
+            + hint_02_scene
+            + level_02_scene
+            + credit_scene
+        )
 
-        self.scene_manager += main_menu_scene
-        self.scene_manager += play_scene
-
-        self.scene_manager << main_menu_scene
+        self.scene_manager << splash_scene
 
     def _run_vision(self) -> None:
         if not self.face:
@@ -109,6 +129,11 @@ class TheHandGame:
 
             self.vision_clock.tick(self.state.vision_FPS)
 
+    def _next_scene(self) -> None:
+        success = self.scene_manager.next()
+        if not success:
+            self.quit()
+
     def _handle_events(self) -> None:
         self.state.events = pg.event.get()
 
@@ -116,16 +141,18 @@ class TheHandGame:
             if event.type == pg.QUIT:
                 self.quit()
 
+            if event.type == pg.MOUSEBUTTONDOWN:
+                self._next_scene()
+
             if event.type == Event.COMMAND.value:
                 if event.code == EventCode.COMMAND_NEXT_SCENE:
-                    if not self.scene_manager._current_scene.next_scene:
-                        self.quit()
-                    self.scene_manager.next()
+                    self._next_scene()
 
 
 def main():
     pg.init()
     pg.font.init()
+    pg.display.set_caption("[GAME_NO_NAME]")
 
     game = TheHandGame()
 

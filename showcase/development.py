@@ -6,15 +6,12 @@ from thehand import TheHandGame
 def main():
     pg.init()
     pg.font.init()
+    pg.display.set_caption("[GAME_NO_NAME]")
 
     game = TheHandGame()
 
     game.state.debug_mode = True
     game.state.display_flag = pg.SHOWN
-    game.state.sr_enable = True
-    game.state.hand_enable = False
-    game.state.face_enable = False
-    game.state.pose_enable = False
 
     game.init()
     game()
