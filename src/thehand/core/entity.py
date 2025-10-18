@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-import pygame
+import pygame as pg
 
 COLOR_PINK = (255, 0, 255)
 
@@ -18,7 +18,7 @@ class Entity(ABC):
         y: float,
         width: int,
         height: int,
-        image: pygame.Surface | None = None,
+        image: pg.Surface | None = None,
     ):
         """
         Initializes the Entity with basic properties.
@@ -34,17 +34,15 @@ class Entity(ABC):
         self.width: int = width
         self.height: int = height
 
-        self.image: pygame.Surface = (
+        self.image: pg.Surface = (
             image if image is not None else self._create_placeholder_surface()
         )
 
-        self.rect: pygame.Rect = pygame.Rect(
-            int(self.x), int(self.y), self.width, self.height
-        )
+        self.rect: pg.Rect = pg.Rect(int(self.x), int(self.y), self.width, self.height)
 
-    def _create_placeholder_surface(self) -> pygame.Surface:
+    def _create_placeholder_surface(self) -> pg.Surface:
         """Creates a simple placeholder surface if no image is provided."""
-        surf = pygame.Surface((self.width, self.height))
+        surf = pg.Surface((self.width, self.height))
         surf.fill(COLOR_PINK)
         return surf
 
@@ -59,7 +57,7 @@ class Entity(ABC):
         pass
 
     @abstractmethod
-    def render(self, surface: pygame.Surface):
+    def render(self, surface: pg.Surface):
         """
         Abstract method to draw the entity onto the game screen/surface.
 

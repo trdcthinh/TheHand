@@ -1,6 +1,6 @@
 from typing import Tuple
 
-import pygame
+import pygame as pg
 
 from thehand.core import Entity
 
@@ -24,5 +24,5 @@ class RectangleEntity(Entity):
     def update(self, dt: float) -> None:
         pass
 
-    def render(self, surface: pygame.Surface) -> None:
+    def render(self, surface: pg.Surface) -> None:
         surface.blit(self.image, self.rect)

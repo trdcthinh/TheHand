@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-import pygame
+import pygame as pg
 
 from thehand.core.state import State
 
@@ -9,7 +9,7 @@ class Scene(ABC):
     def __init__(
         self,
         name: str,
-        screen: pygame.Surface,
+        screen: pg.Surface,
         state: State,
     ) -> None:
         self.name: str = name
@@ -25,7 +25,7 @@ class Scene(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def handle_events(self, events: list[pygame.event.Event]) -> None:
+    def handle_events(self) -> None:
         raise NotImplementedError
 
     @abstractmethod

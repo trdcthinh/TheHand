@@ -3,13 +3,13 @@ from threading import Thread
 import pygame as pg
 
 from thehand.core import (
+    Camera,
     FaceLandmarker,
     HandLandmarker,
     PoseLandmarker,
     SceneManager,
     SpeechRecognition,
     State,
-    Camera,
 )
 from thehand.core.event import Event, EventCode
 from thehand.game.scene import OpeningScene, PlayScene
@@ -34,15 +34,6 @@ class TheHandGame:
         self.screen: pg.Surface | None = None
 
     def __call__(self) -> None:
-        if not self.scene_manager:
-            raise TypeError("SceneManager is not initialized")
-
-        scene_manager_thread = Thread(target=self.scene_manager.run, daemon=True)
-        scene_manager_thread.start()
-
-        if not self.sr:
-            raise TypeError("SpeechRecognition is not initialized")
-
         sr_thread = Thread(target=self.sr.run, daemon=True)
         sr_thread.start()
 
@@ -51,7 +42,8 @@ class TheHandGame:
 
         while True:
             self._handle_events()
-            self.clock.tick(20)
+            self.scene_manager()
+            self.clock.tick(self.state.FPS)
 
     def init(self) -> None:
         self.scene_manager = SceneManager(self.state)
@@ -73,13 +65,15 @@ class TheHandGame:
         self.sr.stop()
         self.scene_manager.stop()
         pg.quit()
+        print("\n\n\n" + " QUIT GAME ".center(80, "="))
+        print("\n\n" + " Thank you for playing our game! ".center(80, "=") + "\n\n")
         exit(0)
 
     def _setup_scenes(self) -> None:
         opening_scene = OpeningScene(
             "open", self.screen, self.state, self.sr, self.hand
         )
-        play_scene = PlayScene("play", self.screen, self.state, self.sr)
+        play_scene = PlayScene("play", self.screen, self.state, self.sr, self.hand)
 
         opening_scene >> play_scene
 
@@ -107,15 +101,15 @@ class TheHandGame:
             self.vision_clock.tick(self.state.vision_FPS)
 
     def _handle_events(self) -> None:
-        for event in pg.event.get():
+        self.state.events = pg.event.get()
+
+        for event in self.state.events:
             if event.type == pg.QUIT:
-                print("End game!")
                 self.quit()
 
             if event.type == Event.COMMAND.value:
                 if event.code == EventCode.COMMAND_NEXT_SCENE:
-                    if not self.scene_manager.current_scene.next_scene:
-                        print("End game!")
+                    if not self.scene_manager._current_scene.next_scene:
                         self.quit()
                     self.scene_manager.next()
 
@@ -128,10 +122,6 @@ def main():
 
     game.state.debug_mode = True
     game.state.display_flag = pg.SHOWN
-    game.state.sr_enable = True
-    game.state.hand_enable = False
-    game.state.face_enable = False
-    game.state.pose_enable = False
 
     game.init()
     game()

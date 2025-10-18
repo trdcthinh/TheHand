@@ -1,4 +1,4 @@
-from thehand.core import HandLandmarker, Camera
+from thehand.core import Camera, HandLandmarker
 
 
 def main():

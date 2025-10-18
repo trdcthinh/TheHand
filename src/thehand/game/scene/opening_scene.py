@@ -1,22 +1,21 @@
 import pygame as pg
 
-from thehand.core import Scene, SpeechRecognition, State, HandLandmarker
+from thehand.core import HandLandmarker, Scene, SpeechRecognition, State
 from thehand.core.event import create_next_scene_event
-from thehand.game.callbacks import dislike_callback
+from thehand.examples.callback import dislike_quit_callback, sr_next_scene_callback
 
 
 class OpeningScene(Scene):
     def sr_callback(self, text: str):
         self.display_text = text
-        if "next" in text.lower():
-            pg.event.post(create_next_scene_event())
+        sr_next_scene_callback(text)
 
     def setup(self):
         self.sr.set_result_callback(self.sr_callback)
-        self.hand.result_callback = dislike_callback
+        self.hand.set_result_callback(dislike_quit_callback)
 
-    def handle_events(self, events):
-        for event in events:
+    def handle_events(self):
+        for event in self.state.events:
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 pg.event.post(create_next_scene_event())
 

@@ -1,4 +1,4 @@
-import pygame
+import pygame as pg
 
 from thehand.core import SceneManager, State
 from thehand.examples.scene.basic_scene import BasicScene
@@ -7,11 +7,11 @@ DEFAULT_WINDOW_SIZE: tuple[int, int] = (1280, 720)
 
 
 def main():
-    pygame.init()
-    pygame.font.init()
-    pygame.display.set_caption("Example Game")
+    pg.init()
+    pg.font.init()
+    pg.display.set_caption("Example Game")
 
-    screen = pygame.display.set_mode(DEFAULT_WINDOW_SIZE)
+    screen = pg.display.set_mode(DEFAULT_WINDOW_SIZE)
 
     state = State()
     state.debug_mode = True
