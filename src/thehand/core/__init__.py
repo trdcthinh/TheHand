@@ -7,3 +7,4 @@ from thehand.core.vision import Camera as Camera
 from thehand.core.vision import FaceLandmarker as FaceLandmarker
 from thehand.core.vision import HandLandmarker as HandLandmarker
 from thehand.core.vision import PoseLandmarker as PoseLandmarker
+from thehand.core.utils import asset_path as asset_path

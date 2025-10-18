@@ -6,7 +6,7 @@ from thehand.core.configs import DEFAULT_WINDOW_SIZE
 class State:
     def __init__(self) -> None:
         self.debug_mode = False
-        self.display_flag = pg.NOFRAME
+        self.display_flag = pg.FULLSCREEN
         self.window_size = DEFAULT_WINDOW_SIZE
 
         self.FPS = 60
