@@ -1,14 +1,9 @@
 import pygame as pg
-from mediapipe.tasks.python.components.containers.landmark import Landmark
-from mediapipe.tasks.python.vision.face_landmarker import FaceLandmarkerResult
 from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
-from mediapipe.tasks.python.vision.pose_landmarker import PoseLandmarkerResult
 
 from thehand.core.event import create_number_event, create_quit_event
 from thehand.core.utils import print_inline
-from thehand.core.vision.utils import (
-    is_hand_dislike,
-)
+from thehand.core.vision import is_hand_dislike
 
 
 def count_hand_callback(result: HandLandmarkerResult) -> None:

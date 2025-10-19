@@ -31,12 +31,12 @@ class MainMenuScene(Scene):
                 frame_img = pil_img.convert("RGBA")
                 raw_str = frame_img.tobytes()
                 size = frame_img.size
-                pg_img = pg.image.fromstring(raw_str, size, "RGBA")
+                pg_img = pg.image.frombytes(raw_str, size, "RGBA")
                 self.bg_frames.append(pg_img)
-        except Exception as e:
+        except Exception:
             self.bg_frames = []
         # Button setup
-        self.button_font = pg.font.Font("data/fonts/PixeloidSans-Bold.ttf", 36)
+        self.button_font = pg.font.Font("data/fonts/PixeloidSansBold.ttf", 36)
         self.start_btn_rect = pg.Rect(0, 0, 260, 70)
         self.quit_btn_rect = pg.Rect(0, 0, 260, 70)
         w, h = self.screen.get_size()
