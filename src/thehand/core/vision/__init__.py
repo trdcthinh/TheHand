@@ -1,5 +1,11 @@
 from thehand.core.vision.camera import Camera as Camera
 from thehand.core.vision.face_landmarker import FaceLandmarker as FaceLandmarker
+from thehand.core.vision.face_utils import (
+    get_smile_score as get_smile_score,
+)
+from thehand.core.vision.face_utils import (
+    is_smile as is_smile,
+)
 from thehand.core.vision.hand_landmarker import HandLandmarker as HandLandmarker
 from thehand.core.vision.hand_utils import (
     get_hand_position_on_screen as get_hand_position_on_screen,
@@ -51,6 +57,7 @@ from thehand.core.vision.hand_utils import (
     is_hand_vertical_up as is_hand_vertical_up,
 )
 from thehand.core.vision.pose_landmarker import PoseLandmarker as PoseLandmarker
+from thehand.core.vision.pose_utils import is_arm_joint_close as is_arm_joint_close
 from thehand.core.vision.utils import (
     calculate_angle_2d as calculate_angle_2d,
 )

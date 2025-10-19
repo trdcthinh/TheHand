@@ -5,7 +5,7 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
 
 from thehand.core import Camera, HandLandmarker
-from thehand.core.vision.utils import get_hand_position_on_screen
+from thehand.core.vision import get_hand_position_on_screen
 
 detection_result = None
 
