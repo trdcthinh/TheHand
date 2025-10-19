@@ -40,4 +40,4 @@ class SceneManager:
         if not self._current_scene or not self._current_scene.next_scene:
             return False
 
-        return self.set_current(self._current_scene.next_scene.name)
+        return self.set_current(self._current_scene.next_scene)

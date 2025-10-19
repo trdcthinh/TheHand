@@ -16,13 +16,13 @@ class Scene(ABC):
         self.screen = screen
         self.state: State = state
 
-        self.next_scene: "Scene | None" = None
+        self.next_scene: str = ""
 
         self.have_setup = False
         self.done = False
 
     def __rshift__(self, other: "Scene") -> "Scene":
-        self.next_scene = other
+        self.next_scene = other.name
         return other
 
     @abstractmethod

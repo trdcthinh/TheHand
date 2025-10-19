@@ -63,8 +63,8 @@ class MainMenuScene(Scene):
                 self._delayed_done()
             elif "start" in t:
                 self._activate_button("start")
-                if self.next_scene:
-                    self._delayed_done()
+                self.next_scene = "tutorial"
+                self._delayed_done()
 
     def handle_events(self):
         for event in self.state.events:
@@ -75,7 +75,7 @@ class MainMenuScene(Scene):
                 mx, my = event.pos
                 if self.start_btn_rect.collidepoint(mx, my):
                     self._activate_button("start")
-                    # TODO: chuyển scene vào game
+                    self.next_scene = "tutorial"
                     self._delayed_done()
                 elif self.quit_btn_rect.collidepoint(mx, my):
                     self._activate_button("quit")
