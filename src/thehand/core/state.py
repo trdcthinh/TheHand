@@ -28,3 +28,9 @@ class State:
         self.face_running = False
         self.hand_running = False
         self.pose_running = False
+
+        self.sounds = {
+            "error": pg.mixer.Sound("data/audio/error.mp3"),
+            "vine_boom": pg.mixer.Sound("data/audio/vine-boom.mp3"),
+            "auughhh": pg.mixer.Sound("data/audio/auughhh.mp3"),
+        }

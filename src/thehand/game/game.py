@@ -88,7 +88,7 @@ class TheHandGame:
         level_02_scene = Level02Scene("level_02", self.screen, self.state)
         credit_scene = CreditScene("credit", self.screen, self.state)
 
-        splash_scene >> main_menu_scene >> hint_01_scene
+        splash_scene >> main_menu_scene >> tutorial_scene >> hint_01_scene
 
         (
             hint_01_scene
