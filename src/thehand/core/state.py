@@ -9,10 +9,12 @@ class State:
         self.display_flag = pg.FULLSCREEN
         self.window_size = DEFAULT_WINDOW_SIZE
 
-        self.FPS = 60
-        self.vision_FPS = 10
+        self.FPS: int = 60
+        self.vision_FPS: int = 10
 
+        self.dt: float = 1 / self.FPS
         self.events: list[pg.event.Event] = []
+        self.cursor = pg.SYSTEM_CURSOR_ARROW
 
         self.sys_font = pg.font.SysFont("Comic Sans MS", 24)
         self.display_font_lg = pg.font.Font("data/fonts/MajorMonoDisplay.ttf", 64)

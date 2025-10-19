@@ -3,8 +3,8 @@ from thehand.core.entity import Entity as Entity
 from thehand.core.scene import Scene as Scene
 from thehand.core.scene import SceneManager as SceneManager
 from thehand.core.state import State as State
+from thehand.core.utils import asset_path as asset_path
 from thehand.core.vision import Camera as Camera
 from thehand.core.vision import FaceLandmarker as FaceLandmarker
 from thehand.core.vision import HandLandmarker as HandLandmarker
 from thehand.core.vision import PoseLandmarker as PoseLandmarker
-from thehand.core.utils import asset_path as asset_path
