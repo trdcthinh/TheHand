@@ -6,14 +6,11 @@ from mediapipe.tasks.python.components.containers.landmark import (
 )
 
 from thehand.core.utils import print_inline
-from thehand.core.configs import DEFAULT_WINDOW_SIZE
 
 
 def testing(
     landmarks: list[Landmark], normalized_landmarks: list[NormalizedLandmark]
 ) -> bool:
-    result = get_hand_position_on_screen(normalized_landmarks)
-    print_inline(f"{result:.3f}")
     return True
 
 

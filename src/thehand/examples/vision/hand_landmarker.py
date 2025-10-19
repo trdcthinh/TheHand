@@ -5,7 +5,7 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
 
 from thehand.core import Camera, HandLandmarker
-from thehand.core.vision.utils import testing
+from thehand.core.vision.utils import get_hand_position_on_screen
 
 detection_result = None
 
@@ -28,7 +28,8 @@ def result_callback(result: HandLandmarkerResult):
                 if len(landmarks) < 21:
                     continue
 
-                testing(landmarks, result.hand_landmarks[i])
+                pos = get_hand_position_on_screen(result.hand_landmarks[i], 1980, 1080)
+                print(pos)
 
 
 def draw(rgb_image, detection_result):
