@@ -5,7 +5,7 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
 
 from thehand.core import Camera, HandLandmarker
-from thehand.core.vision.utils import is_hand_peace
+from thehand.core.vision.utils import testing
 
 detection_result = None
 
@@ -25,8 +25,10 @@ def result_callback(result: HandLandmarkerResult):
             hand_landmarks = result.hand_world_landmarks
 
             for i, landmarks in enumerate(hand_landmarks):
-                if len(landmarks) > 0 and is_hand_peace(landmarks):
-                    print("PEACE!!!")
+                if len(landmarks) < 21:
+                    continue
+
+                testing(landmarks, result.hand_landmarks[i])
 
 
 def draw(rgb_image, detection_result):

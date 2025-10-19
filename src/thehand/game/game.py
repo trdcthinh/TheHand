@@ -63,6 +63,8 @@ class TheHandGame:
         self.hand = HandLandmarker()
         self.pose = PoseLandmarker()
 
+        screen_info = pg.display.Info()
+        self.state.window_size = (screen_info.current_w, screen_info.current_h)
         self.screen = pg.display.set_mode(
             self.state.window_size, self.state.display_flag
         )
@@ -81,16 +83,15 @@ class TheHandGame:
         main_menu_scene = MainMenuScene("main_menu", self.screen, self.state)
         tutorial_scene = TutorialScene("tutorial", self.screen, self.state)
         hint_01_scene = HintScene("hint_01", self.screen, self.state)
-        level_01_scene = Level01Scene("level_01", self.screen, self.state)
+        level_01_scene = Level01Scene("level_01", self.screen, self.state, self.hand)
         hint_02_scene = HintScene("hint_02", self.screen, self.state)
         level_02_scene = Level02Scene("level_02", self.screen, self.state)
         credit_scene = CreditScene("credit", self.screen, self.state)
 
+        splash_scene >> main_menu_scene >> hint_01_scene
+
         (
-            splash_scene
-            >> tutorial_scene
-            >> main_menu_scene
-            >> hint_01_scene
+            hint_01_scene
             >> level_01_scene
             >> hint_02_scene
             >> level_02_scene
@@ -141,7 +142,7 @@ class TheHandGame:
             if event.type == pg.QUIT:
                 self.quit()
 
-            if event.type == pg.MOUSEBUTTONDOWN:
+            if event.type == pg.MOUSEBUTTONUP:
                 self._next_scene()
 
             if event.type == Event.COMMAND.value:

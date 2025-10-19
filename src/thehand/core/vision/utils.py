@@ -109,9 +109,11 @@ def calculate_angle_on_screen(p1: tuple[int, int], p2: tuple[int, int]):
 
 def get_hand_position_on_screen(
     normalized_landmarks: list[NormalizedLandmark],
+    screen_width: int,
+    screen_height: int,
 ) -> None | tuple[float, float]:
     coordinates = normalized_landmarks_to_coordinates(
-        normalized_landmarks, DEFAULT_WINDOW_SIZE[0], DEFAULT_WINDOW_SIZE[1]
+        normalized_landmarks, screen_width, screen_height
     )
 
     if coordinates[9]:
