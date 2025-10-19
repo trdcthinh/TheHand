@@ -1,12 +1,18 @@
 import math
 
-from mediapipe.tasks.python.components.containers.landmark import Landmark
+from mediapipe.tasks.python.components.containers.landmark import (
+    Landmark,
+    NormalizedLandmark,
+)
 
 from thehand.core.utils import print_inline
+from thehand.core.configs import DEFAULT_WINDOW_SIZE
 
 
-def testing(landmarks: list[Landmark]) -> bool:
-    result = is_hand_v_capture(landmarks)
+def testing(
+    landmarks: list[Landmark], normalized_landmarks: list[NormalizedLandmark]
+) -> bool:
+    result = get_hand_position_on_screen(normalized_landmarks)
     print_inline(f"{result:.3f}")
     return True
 
@@ -56,6 +62,62 @@ def calculate_angle_3d(lm1: Landmark, vertex: Landmark, lm2: Landmark) -> float:
     angle_degrees = math.degrees(angle_radians)
 
     return angle_degrees
+
+
+def _normalized_to_pixel_coordinates(
+    normalized_x: float, normalized_y: float, image_width: int, image_height: int
+) -> None | tuple[int, int]:
+    # Checks if the float value is between 0 and 1.
+    def is_valid_normalized_value(value: float) -> bool:
+        return (value > 0 or math.isclose(0, value)) and (
+            value < 1 or math.isclose(1, value)
+        )
+
+    if not (
+        is_valid_normalized_value(normalized_x)
+        and is_valid_normalized_value(normalized_y)
+    ):
+        return None
+    x_px = min(math.floor(normalized_x * image_width), image_width - 1)
+    y_px = min(math.floor(normalized_y * image_height), image_height - 1)
+    return x_px, y_px
+
+
+def normalized_landmarks_to_coordinates(
+    landmarks: NormalizedLandmark, image_width: int, image_height: int
+) -> list[None | tuple[int, int]]:
+    coordinates: list[None | tuple[int, int]] = [None] * 21
+
+    for i, landmark in enumerate(landmarks):
+        landmark_px = _normalized_to_pixel_coordinates(
+            landmark.x, landmark.y, image_width, image_height
+        )
+        coordinates[i] = landmark_px
+
+    return coordinates
+
+
+def calculate_angle_on_screen(p1: tuple[int, int], p2: tuple[int, int]):
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+
+    angle_rad = math.atan2(dy, dx)
+    angle_deg = math.degrees(angle_rad)
+
+    return (angle_deg + 360) % 360
+
+
+def get_hand_position_on_screen(
+    normalized_landmarks: list[NormalizedLandmark],
+) -> None | tuple[float, float]:
+    coordinates = normalized_landmarks_to_coordinates(
+        normalized_landmarks, DEFAULT_WINDOW_SIZE[0], DEFAULT_WINDOW_SIZE[1]
+    )
+
+    if coordinates[9]:
+        return (coordinates[9][0], coordinates[9][1])  # ty: ignore[invalid-return-type]
+
+    return None
 
 
 def is_hand_like(landmarks: list[Landmark]) -> bool:
