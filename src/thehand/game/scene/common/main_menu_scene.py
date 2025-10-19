@@ -1,4 +1,5 @@
 import pygame as pg
+
 from thehand.core import Scene, State
 
 
@@ -10,8 +11,10 @@ class MainMenuScene(Scene):
         state: State,
     ):
         super().__init__(name, screen, state)
-        from thehand.core import asset_path
         import os
+
+        from thehand.core import asset_path
+
         self.caption = "No KEYBOARD No MOUSE"
         # Load GIF frames
         self.bg_frames = []
@@ -20,6 +23,7 @@ class MainMenuScene(Scene):
         self.bg_frame_delay = 100  # ms per frame
         try:
             import PIL.Image
+
             gif_path = asset_path(os.path.join("imgs", "menu_background.gif"))
             pil_img = PIL.Image.open(gif_path)
             for frame in range(0, pil_img.n_frames):
@@ -43,6 +47,7 @@ class MainMenuScene(Scene):
         self.active_btn_time = 0
         # Speech recognition
         from thehand.core.audition.speech_recognition import SpeechRecognition
+
         self.last_spoken = ""
         self.sr_running = False
         self.sr = SpeechRecognition(state, self._on_speech)
@@ -51,9 +56,11 @@ class MainMenuScene(Scene):
         pg.display.set_caption(self.caption)
         if not self.sr_running:
             import threading
+
             self.sr_running = True
             threading.Thread(target=self.sr.run, daemon=True).start()
-    #Nói Quit để thoát game
+
+    # Nói Quit để thoát game
     def _on_speech(self, text):
         if text:
             self.last_spoken = text
@@ -80,12 +87,16 @@ class MainMenuScene(Scene):
                 elif self.quit_btn_rect.collidepoint(mx, my):
                     self._activate_button("quit")
                     self._delayed_done()
+
     def _delayed_done(self):
         import threading
+
         def set_done():
             import time
+
             time.sleep(1.5)
             self.done = True
+
         threading.Thread(target=set_done, daemon=True).start()
 
     def update(self):
@@ -101,19 +112,27 @@ class MainMenuScene(Scene):
     def render(self):
         # Draw animated background
         if self.bg_frames:
-            bg = pg.transform.scale(self.bg_frames[self.bg_frame_idx], self.screen.get_size())
+            bg = pg.transform.scale(
+                self.bg_frames[self.bg_frame_idx], self.screen.get_size()
+            )
             self.screen.blit(bg, (0, 0))
         else:
             self.screen.fill((25, 25, 25))
         # Draw Start button
-        self._draw_button(self.start_btn_rect, "START", active=(self.active_btn == "start"))
+        self._draw_button(
+            self.start_btn_rect, "START", active=(self.active_btn == "start")
+        )
         # Draw Quit button
-        self._draw_button(self.quit_btn_rect, "QUIT", active=(self.active_btn == "quit"))
+        self._draw_button(
+            self.quit_btn_rect, "QUIT", active=(self.active_btn == "quit")
+        )
         # Draw last spoken text as subtitle
         if self.last_spoken:
             subtitle_font = pg.font.Font("data/fonts/SpaceMono.ttf", 32)
             subtitle_surf = subtitle_font.render(self.last_spoken, True, (255, 255, 0))
-            subtitle_rect = subtitle_surf.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() - 60))
+            subtitle_rect = subtitle_surf.get_rect(
+                center=(self.screen.get_width() // 2, self.screen.get_height() - 60)
+            )
             self.screen.blit(subtitle_surf, subtitle_rect)
         pg.display.flip()
 

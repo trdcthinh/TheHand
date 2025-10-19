@@ -1,11 +1,11 @@
-import pygame as pg
 import random
 
-from thehand.core import Scene, State, HandLandmarker, asset_path
-from thehand.core.event import Event, EventCode, create_vector_event
-
+import pygame as pg
 from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
-from thehand.core.vision.utils import get_hand_position_on_screen
+
+from thehand.core import HandLandmarker, Scene, State, asset_path
+from thehand.core.event import Event, EventCode, create_vector_event
+from thehand.core.vision import get_hand_position_on_screen
 
 
 class Collectible(pg.sprite.Sprite):

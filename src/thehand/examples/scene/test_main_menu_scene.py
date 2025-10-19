@@ -1,6 +1,8 @@
 import pygame as pg
+
 from thehand.core import State
 from thehand.game.scene.common.main_menu_scene import MainMenuScene
+
 
 def main():
     pg.init()
@@ -19,6 +21,7 @@ def main():
         if scene.done:
             running = False
     pg.quit()
+
 
 if __name__ == "__main__":
     main()
