@@ -1,8 +1,8 @@
-from thehand.core import Scene, State, Store
+import thehand as th
 
 
-class EmptyScene(Scene):
-    def __init__(self, name: str, state: State, store: Store):
+class EmptyScene(th.Scene):
+    def __init__(self, name: str, state: th.State, store: th.Store):
         super().__init__(name, state, store)
 
     def setup(self):

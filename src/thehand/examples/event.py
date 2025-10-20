@@ -3,24 +3,18 @@ import time
 
 import pygame as pg
 
-from thehand.core import Event, EventCode
-from thehand.core.event import (
-    create_next_scene_event,
-    create_number_event,
-    create_open_menu_event,
-    create_vector_event,
-)
+import thehand as th
 
 
 def audition_thread_function():
     time.sleep(2)
-    pg.event.post(create_open_menu_event())
+    pg.event.post(th.create_open_menu_event())
     time.sleep(2)
-    pg.event.post(create_next_scene_event())
+    pg.event.post(th.create_next_scene_event())
     time.sleep(2)
-    pg.event.post(create_number_event(999))
+    pg.event.post(th.create_number_event(999))
     time.sleep(2)
-    pg.event.post(create_vector_event(1, -1))
+    pg.event.post(th.create_vector_event((1, -1)))
 
 
 def main():
@@ -35,30 +29,22 @@ def main():
     audition_thread.daemon = True
     audition_thread.start()
 
-    last_event: str = ""
-    value: str = ""
+    last_code = None
+    last_value: str = ""
 
     while running:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
 
-            if event.type == Event.COMMAND.value or event.type == Event.VALUE.value:
-                print(f"Custom event: {event}")
-                last_event = event.code.name
-
-            if event.type == Event.COMMAND.value:
-                value = event.value
-
-            if event.type == Event.VALUE.value:
-                if event.code == EventCode.VALUE_NUMBER:
-                    value = f"{event.value}"
-                if event.code == EventCode.VALUE_VECTOR:
-                    value = f"({event.x}, {event.y})"
+            if event.type == th.THEHAND_EVENT:
+                print(f"TheHand event: {event}")
+                last_code = event.code
+                last_value = event.value
 
         screen.fill((0, 0, 0))
         font = pg.font.Font(None, 36)
-        text = font.render(f"Last event:\n{last_event}\n{value}", True, (0, 255, 0))
+        text = font.render(f"Last event: {last_code}\nLast value: {last_value}", True, (0, 255, 0))
         screen.blit(text, (50, 50))
         pg.display.flip()
         clock.tick(60)

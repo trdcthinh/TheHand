@@ -1,24 +1,21 @@
-from typing import Tuple
-
 import pygame as pg
 
-from thehand.core import Entity, State
-from thehand.core.store import COLOR_MOCHA_BASE, COLOR_MOCHA_TEXT
+import thehand as th
 
 
-class Toast(Entity):
+class Toast(th.Entity):
     def __init__(
         self,
         x: float,
         y: float,
         width: int,
         height: int,
-        state: State,
+        state: th.State,
         text: str,
-        duration: int = 3000,  # in milliseconds
+        duration: int = 3000,
         font: pg.font.Font | None = None,
-        color: Tuple[int, int, int] = COLOR_MOCHA_TEXT,
-        bg_color: Tuple[int, int, int] = COLOR_MOCHA_BASE,
+        color: tuple[int, int, int] = th.COLOR_MOCHA_TEXT,
+        bg_color: tuple[int, int, int] = th.COLOR_MOCHA_BASE,
         bg_opacity: float = 0.8,
     ) -> None:
         super().__init__(x, y, width, height)

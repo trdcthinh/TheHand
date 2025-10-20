@@ -3,7 +3,7 @@ from mediapipe.tasks.python.components.containers.landmark import (
     NormalizedLandmark,
 )
 
-from thehand.core.vision.utils import (
+from .utils import (
     calculate_angle_2d,
     calculate_angle_3d,
     calculate_distance,
@@ -16,12 +16,10 @@ def get_hand_position_on_screen(
     screen_width: int,
     screen_height: int,
 ) -> None | tuple[float, float]:
-    coordinates = normalized_landmarks_to_coordinates(
-        normalized_landmarks, screen_width, screen_height
-    )
+    coordinates = normalized_landmarks_to_coordinates(normalized_landmarks, screen_width, screen_height)
 
     if coordinates[9]:
-        return (coordinates[9][0], coordinates[9][1])  # ty: ignore[invalid-return-type]
+        return coordinates[9][0], coordinates[9][1]  # ty: ignore[invalid-return-type]
 
     return None
 

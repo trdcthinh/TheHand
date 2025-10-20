@@ -1,27 +1,26 @@
-from typing import Callable, Tuple
+from typing import Callable
 
 import pygame as pg
 
-from thehand.core import Entity, State
-from thehand.core.store import COLOR_MOCHA_BASE, COLOR_MOCHA_TEXT
+import thehand as th
 
 
-class Button(Entity):
+class Button(th.Entity):
     def __init__(
         self,
         x: float,
         y: float,
         width: int,
         height: int,
-        state: State,
+        state: th.State,
         text: str,
         click_callback: Callable[[], None] | None = None,
         font: pg.font.Font | None = None,
-        color: Tuple[int, int, int] = COLOR_MOCHA_TEXT,
-        hover_color: Tuple[int, int, int] = COLOR_MOCHA_TEXT,
-        bg_color: Tuple[int, int, int] = COLOR_MOCHA_BASE,
+        color: tuple[int, int, int] = th.COLOR_MOCHA_TEXT,
+        hover_color: tuple[int, int, int] = th.COLOR_MOCHA_TEXT,
+        bg_color: tuple[int, int, int] = th.COLOR_MOCHA_BASE,
         bg_opacity: float = 0.5,
-        bg_hover_color: Tuple[int, int, int] = COLOR_MOCHA_BASE,
+        bg_hover_color: tuple[int, int, int] = th.COLOR_MOCHA_BASE,
         bg_hover_opacity: float = 0.8,
     ) -> None:
         super().__init__(x, y, width, height)
@@ -69,7 +68,7 @@ class Button(Entity):
     def setup(self):
         return
 
-    def handle_events(self, mouse_pos: Tuple[int, int]) -> None:
+    def handle_events(self, mouse_pos: tuple[int, int]) -> None:
         if (mouse_pos[0] in range(self.rect.left, self.rect.right)) and (
             mouse_pos[1] in range(self.rect.top, self.rect.bottom)
         ):
@@ -94,7 +93,7 @@ class Button(Entity):
 
         surface.blit(self.current_text, self.text_rect)
 
-    def check_for_click(self, mouse_pos: Tuple[int, int]) -> None:
+    def check_for_click(self, mouse_pos: tuple[int, int]) -> None:
         if (mouse_pos[0] in range(self.rect.left, self.rect.right)) and (
             mouse_pos[1] in range(self.rect.top, self.rect.bottom)
         ):
@@ -113,7 +112,7 @@ if __name__ == "__main__":
 
     screen = pg.display.set_mode(win_size)
 
-    state = State()
+    state = th.State()
 
     button = Button(
         win_size[0] // 2,

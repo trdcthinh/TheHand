@@ -32,9 +32,7 @@ class Transcriber:
 
 
 class SpeechRecognition:
-    def __init__(
-        self, state: State, result_callback: SrResultCallback | None = None
-    ) -> None:
+    def __init__(self, state: State, result_callback: SrResultCallback | None = None) -> None:
         self._state = state
         self._result_callback = result_callback
 
@@ -58,9 +56,7 @@ class SpeechRecognition:
             channels=1,
             blocksize=CHUNK_SIZE,
             dtype=np.float32,
-            callback=lambda data, frames, time_, status: self._q_data.put(
-                (data.copy().flatten(), status)
-            ),
+            callback=lambda data, frames, time_, status: self._q_data.put((data.copy().flatten(), status)),
         )
 
         self.captions = []

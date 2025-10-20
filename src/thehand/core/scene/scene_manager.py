@@ -1,6 +1,9 @@
-from thehand.core.scene.scene import Scene
+import pygame as pg
+
 from thehand.core.state import State
 from thehand.core.store import Store
+
+from .scene import Scene
 
 
 class SceneManager:
@@ -13,14 +16,15 @@ class SceneManager:
         self._current_scene: Scene | None = None
 
     def __call__(self) -> None:
-        if self._current_scene.done:
-            self.next()
+        if not self._current_scene._have_setup:
+            self._current_scene._setup()
         self._current_scene.handle_events()
         self._current_scene.update()
         self._current_scene.render()
+        pg.display.flip()
 
     def __add__(self, scene: Scene) -> "SceneManager":
-        self.add(scene)
+        self.scenes[scene.name] = scene
         return self
 
     def __lshift__(self, scene: Scene) -> None:
@@ -30,13 +34,8 @@ class SceneManager:
         if not self.scenes.get(scene):
             return False
 
-        self._current_scene: Scene = self.scenes[scene]
-        if not self._current_scene.have_setup:
-            self._current_scene.setup()
+        self._current_scene = self.scenes[scene]
         return True
-
-    def add(self, scene: Scene) -> None:
-        self.scenes[scene.name] = scene
 
     def next(self) -> bool:
         if not self._current_scene or not self._current_scene.next_scene:

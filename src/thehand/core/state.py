@@ -1,6 +1,6 @@
 import pygame as pg
 
-from thehand.core.configs import DEFAULT_WINDOW_SIZE
+from .configs import DEFAULT_WINDOW_SIZE
 
 
 class State:
@@ -13,7 +13,8 @@ class State:
         self.FPS: int = 60
         self.vision_FPS: int = 10
 
-        self.dt: float = 1 / self.FPS
+        self.now = pg.time.get_ticks()
+        self.dt: int = 1000 // self.FPS
         self.events: list[pg.event.Event] = []
         self.cursor = pg.SYSTEM_CURSOR_ARROW
 

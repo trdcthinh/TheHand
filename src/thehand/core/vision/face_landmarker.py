@@ -34,8 +34,6 @@ class FaceLandmarker:
     def set_result_callback(self, callback: FaceResultCallback) -> None:
         self._result_callback = callback
 
-    def _mediapipe_result_callback(
-        self, result: vision.FaceLandmarkerResult, _, timestamp_ms: int
-    ) -> None:
+    def _mediapipe_result_callback(self, result: vision.FaceLandmarkerResult, _, timestamp_ms: int) -> None:
         if self._result_callback:
             self._result_callback(result)
