@@ -15,7 +15,7 @@ from thehand.core.event import Event, EventCode
 from thehand.game.scene import (
     CreditScene,
     HintScene,
-    Level01Scene,
+    Level1Scene,
     Level02Scene,
     MainMenuScene,
     SplashScene,
@@ -83,7 +83,7 @@ class TheHandGame:
         main_menu_scene = MainMenuScene("main_menu", self.screen, self.state)
         tutorial_scene = TutorialScene("tutorial", self.screen, self.state)
         hint_01_scene = HintScene("hint_01", self.screen, self.state)
-        level_01_scene = Level01Scene("level_01", self.screen, self.state, self.hand)
+        level_01_scene = Level1Scene("level_01", self.screen, self.state, self.hand)
         hint_02_scene = HintScene("hint_02", self.screen, self.state)
         level_02_scene = Level02Scene("level_02", self.screen, self.state)
         credit_scene = CreditScene("credit", self.screen, self.state)

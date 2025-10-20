@@ -6,6 +6,8 @@ from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
 from thehand.core import HandLandmarker, Scene, State, asset_path
 from thehand.core.event import Event, EventCode, create_vector_event
 from thehand.core.vision import get_hand_position_on_screen
+from thehand.game.widgets.toast import Toast
+from thehand.core.store import COLOR_MOCHA_BASE, COLOR_MOCHA_GREEN
 
 
 class Collectible(pg.sprite.Sprite):
@@ -20,7 +22,7 @@ class Collectible(pg.sprite.Sprite):
 class Apple(Collectible):
     def __init__(self, pos):
         size_points = random.choices(
-            [(50, 1), (80, 2), (120, 5), (150, 20), (300, 100)], [50, 20, 10, 5, 1]
+            [(50, 1), (80, 10), (120, 50), (150, 200), (300, 1000)], [50, 20, 10, 5, 1]
         )
         size = size_points[0][0]
         points = size_points[0][1]
@@ -30,14 +32,15 @@ class Apple(Collectible):
 class Strawberry(Collectible):
     def __init__(self, pos):
         size_points = random.choices(
-            [(50, 1), (80, 2), (120, 5), (150, 20), (300, 100)], [50, 20, 10, 5, 1]
+            [(50, 5), (80, 50), (120, 200), (150, 1000), (300, 5000)],
+            [50, 20, 10, 5, 1],
         )
         size = size_points[0][0]
         points = size_points[0][1] * 2
         super().__init__("imgs/strawberry.png", pos, points, (size, size))
 
 
-class Level01Scene(Scene):
+class Level1Scene(Scene):
     def __init__(
         self,
         name: str,
@@ -49,7 +52,7 @@ class Level01Scene(Scene):
 
         self.hand = hand
 
-        self.pacman = pg.image.load(asset_path("imgs/pacman-right.png")).convert_alpha()
+        self.pacman = pg.image.load(asset_path("imgs/pacman_right.png")).convert_alpha()
         self.pacman = pg.transform.scale(self.pacman, (150, 150))
 
         self.pacman_pos = pg.Vector2(
@@ -64,6 +67,8 @@ class Level01Scene(Scene):
         self.collectibles = pg.sprite.Group()
         self._spawn_margin = int(0.2 * self.state.window_size[1])
         self._spawn_initial_collectibles()
+
+        self.toasts: list[Toast] = []
 
     def _spawn_collectible(self, collectible_type):
         pos = (
@@ -109,7 +114,26 @@ class Level01Scene(Scene):
         )
         for collectible in collided_collectibles:
             self.score += collectible.points
+            toast = Toast(
+                collectible.rect.centerx,
+                collectible.rect.centery,
+                100,
+                50,
+                self.state,
+                f"+ {collectible.points}",
+                1000,
+                color=COLOR_MOCHA_BASE,
+                bg_color=COLOR_MOCHA_GREEN,
+            )
+            toast.show()
+            self.toasts.append(toast)
             self._spawn_collectible(type(collectible))
+
+        for toast in self.toasts:
+            toast.update()
+        self.toasts = [
+            toast for toast in self.toasts if toast.animation_state != "HIDDEN"
+        ]
 
     def render(self):
         self.screen.fill((25, 25, 25))
@@ -123,8 +147,9 @@ class Level01Scene(Scene):
         )
         self.screen.blit(score_text, (10, 10))
 
-        text = self.state.text_font_md.render(self.name, True, (240, 240, 240))
-        self.screen.blit(text, (100, 100))
+        for toast in self.toasts:
+            toast.render(self.screen)
+
         pg.display.flip()
 
     def _hand_result_callback(self, result: HandLandmarkerResult) -> None:

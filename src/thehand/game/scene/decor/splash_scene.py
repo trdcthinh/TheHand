@@ -22,12 +22,12 @@ class SplashScene(Scene):
         self.animation_speed = 2
         self.zoom_speed = 0.005
 
-        self.duration = 2500
+        self.duration = 3500
         self.start_time = pg.time.get_ticks()
 
     def setup(self):
         original_image = pg.image.load(
-            asset_path("imgs/TheHand-icon-shad.png")
+            asset_path("imgs/thehand_icon.png")
         ).convert_alpha()
         new_height = self.screen.get_height() * self.icon_ratio
         aspect_ratio = original_image.get_width() / original_image.get_height()

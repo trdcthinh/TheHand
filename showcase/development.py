@@ -11,7 +11,6 @@ def main():
     game = TheHandGame()
 
     game.state.debug_mode = True
-    game.state.display_flag = pg.SHOWN
 
     game.init()
     game()
