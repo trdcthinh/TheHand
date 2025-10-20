@@ -15,8 +15,7 @@ from thehand.core.event import Event, EventCode
 from thehand.game.scene import (
     CreditScene,
     HintScene,
-    Level1Scene,
-    Level02Scene,
+    PacmanScene,
     MainMenuScene,
     SplashScene,
     TutorialScene,
@@ -82,31 +81,22 @@ class TheHandGame:
         splash_scene = SplashScene("splash", self.screen, self.state)
         main_menu_scene = MainMenuScene("main_menu", self.screen, self.state)
         tutorial_scene = TutorialScene("tutorial", self.screen, self.state)
-        hint_01_scene = HintScene("hint_01", self.screen, self.state)
-        level_01_scene = Level1Scene("level_01", self.screen, self.state, self.hand)
-        hint_02_scene = HintScene("hint_02", self.screen, self.state)
-        level_02_scene = Level02Scene("level_02", self.screen, self.state)
+        hint_pacman_scene = HintScene("hint_pacman", self.screen, self.state)
+        pacman_scene = PacmanScene("pacman", self.screen, self.state, self.hand)
         credit_scene = CreditScene("credit", self.screen, self.state)
 
-        splash_scene >> main_menu_scene >> tutorial_scene >> hint_01_scene
+        splash_scene >> main_menu_scene
+        tutorial_scene >> main_menu_scene
 
-        (
-            hint_01_scene
-            >> level_01_scene
-            >> hint_02_scene
-            >> level_02_scene
-            >> credit_scene
-        )
+        hint_pacman_scene >> pacman_scene
 
         (
             self.scene_manager
             + splash_scene
             + tutorial_scene
             + main_menu_scene
-            + hint_01_scene
-            + level_01_scene
-            + hint_02_scene
-            + level_02_scene
+            + hint_pacman_scene
+            + pacman_scene
             + credit_scene
         )
 

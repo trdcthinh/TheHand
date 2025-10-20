@@ -40,7 +40,7 @@ class Strawberry(Collectible):
         super().__init__("imgs/strawberry.png", pos, points, (size, size))
 
 
-class Level1Scene(Scene):
+class PacmanScene(Scene):
     def __init__(
         self,
         name: str,
