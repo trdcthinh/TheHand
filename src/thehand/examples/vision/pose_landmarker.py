@@ -5,7 +5,7 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks.python.vision.pose_landmarker import PoseLandmarkerResult
 
 from thehand.core import Camera, PoseLandmarker
-from thehand.core.vision.utils import is_hand_peace
+from thehand.core.vision import is_arm_joint_close
 
 detection_result = None
 
@@ -19,14 +19,17 @@ def result_callback(result: PoseLandmarkerResult):
     global detection_result
     detection_result = result
 
-    if result.hand_world_landmarks:
-        # print_inline(f"{len(result.hand_world_landmarks)} hand detected")
-        if len(result.hand_world_landmarks) > 0:
-            hand_landmarks = result.hand_world_landmarks
+    if not result.pose_world_landmarks or len(result.pose_world_landmarks) <= 0:
+        return
 
-            for i, landmarks in enumerate(hand_landmarks):
-                if len(landmarks) > 0 and is_hand_peace(landmarks):
-                    print("PEACE!!!")
+    pose_landmarks = result.pose_world_landmarks
+
+    for i, landmarks in enumerate(pose_landmarks):
+        if len(landmarks) < 21:
+            continue
+
+        res = is_arm_joint_close(landmarks)
+        # print(res)
 
 
 def draw(rgb_image, detection_result):

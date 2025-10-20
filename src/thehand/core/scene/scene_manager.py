@@ -1,10 +1,12 @@
 from thehand.core.scene.scene import Scene
 from thehand.core.state import State
+from thehand.core.store import Store
 
 
 class SceneManager:
-    def __init__(self, state: State) -> None:
+    def __init__(self, state: State, store: Store) -> None:
         self._state = state
+        self._store = store
 
         self.scenes: dict[str, Scene] = {}
 
@@ -40,4 +42,4 @@ class SceneManager:
         if not self._current_scene or not self._current_scene.next_scene:
             return False
 
-        return self.set_current(self._current_scene.next_scene.name)
+        return self.set_current(self._current_scene.next_scene)

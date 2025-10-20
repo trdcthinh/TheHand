@@ -4,8 +4,8 @@ import random
 NOISE_CHARS = "#@$%█▓▒░■—–︱●○◆▪…?|aeiou"
 
 
-def asset_path(rel_path: str) -> str:
-    return os.path.join("data", rel_path)
+def asset_path(category: str, filename: str) -> str:
+    return os.path.join("./data", category, filename)
 
 
 def print_inline(text: str) -> None:

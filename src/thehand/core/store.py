@@ -1,3 +1,8 @@
+import pygame as pg
+
+from thehand.core.configs import DEFAULT_WINDOW_SIZE
+from thehand.core.utils import asset_path
+
 # ===============================================
 # Standard 8-Bit RGB Color Definitions (0-255)
 # ===============================================
@@ -70,3 +75,34 @@ COLOR_MOCHA_SURFACE0 = (49, 50, 68)  # Surface 0 / #313244
 COLOR_MOCHA_BASE = (30, 30, 46)  # Base (Main Background) / #1e1e2e
 COLOR_MOCHA_MANTLE = (24, 24, 37)  # Mantle (Darker Background) / #181825
 COLOR_MOCHA_CRUST = (17, 17, 27)  # Crust (Deepest Background) / #11111b
+
+
+class Store:
+    def __init__(self) -> None:
+        self.screen: pg.Surface = pg.Surface(DEFAULT_WINDOW_SIZE)
+
+        self.font_sys = pg.font.SysFont("Comic Sans MS", 24)
+
+        self.font_display_64 = pg.font.Font(
+            asset_path("fonts", "MajorMonoDisplay.ttf"), 64
+        )
+        self.font_display_48 = pg.font.Font(
+            asset_path("fonts", "MajorMonoDisplay.ttf"), 48
+        )
+        self.font_display_32 = pg.font.Font(
+            asset_path("fonts", "MajorMonoDisplay.ttf"), 32
+        )
+
+        self.font_text_32 = pg.font.Font(asset_path("fonts", "SpaceMono.ttf"), 32)
+        self.font_text_24 = pg.font.Font(asset_path("fonts", "SpaceMono.ttf"), 24)
+        self.font_text_18 = pg.font.Font(asset_path("fonts", "SpaceMono.ttf"), 18)
+
+        self.font_pixel_36 = pg.font.Font(
+            asset_path("fonts", "PixeloidSansBold.ttf"), 36
+        )
+
+        self.sounds: dict[str, pg.mixer.Sound] = {
+            "error": pg.mixer.Sound(asset_path("audio", "error.mp3")),
+            "vine_boom": pg.mixer.Sound(asset_path("audio", "vine_boom.mp3")),
+            "auughhh": pg.mixer.Sound(asset_path("audio", "auughhh.mp3")),
+        }
