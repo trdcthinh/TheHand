@@ -5,9 +5,9 @@ from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
 
 from thehand.core import HandLandmarker, Scene, State, asset_path
 from thehand.core.event import Event, EventCode, create_vector_event
+from thehand.core.store import COLOR_MOCHA_BASE, COLOR_MOCHA_GREEN
 from thehand.core.vision import get_hand_position_on_screen
 from thehand.game.widgets.toast import Toast
-from thehand.core.store import COLOR_MOCHA_BASE, COLOR_MOCHA_GREEN
 
 
 class Collectible(pg.sprite.Sprite):

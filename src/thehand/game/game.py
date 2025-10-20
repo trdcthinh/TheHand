@@ -15,8 +15,8 @@ from thehand.core.event import Event, EventCode
 from thehand.game.scene import (
     CreditScene,
     HintScene,
-    PacmanScene,
     MainMenuScene,
+    PacmanScene,
     SplashScene,
     TutorialScene,
 )
@@ -85,7 +85,7 @@ class TheHandGame:
         pacman_scene = PacmanScene("pacman", self.screen, self.state, self.hand)
         credit_scene = CreditScene("credit", self.screen, self.state)
 
-        splash_scene >> main_menu_scene
+        splash_scene >> main_menu_scene >> tutorial_scene
         tutorial_scene >> main_menu_scene
 
         hint_pacman_scene >> pacman_scene
@@ -148,7 +148,6 @@ def main():
     game = TheHandGame()
 
     game.state.debug_mode = True
-    game.state.display_flag = pg.SHOWN
 
     game.init()
     game()

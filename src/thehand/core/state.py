@@ -18,9 +18,15 @@ class State:
         self.cursor = pg.SYSTEM_CURSOR_ARROW
 
         self.sys_font = pg.font.SysFont("Comic Sans MS", 24)
-        self.display_font_lg = pg.font.Font(asset_path("fonts/MajorMonoDisplay.ttf"), 64)
-        self.display_font_md = pg.font.Font(asset_path("fonts/MajorMonoDisplay.ttf"), 48)
-        self.display_font_sm = pg.font.Font(asset_path("fonts/MajorMonoDisplay.ttf"), 32)
+        self.display_font_lg = pg.font.Font(
+            asset_path("fonts/MajorMonoDisplay.ttf"), 64
+        )
+        self.display_font_md = pg.font.Font(
+            asset_path("fonts/MajorMonoDisplay.ttf"), 48
+        )
+        self.display_font_sm = pg.font.Font(
+            asset_path("fonts/MajorMonoDisplay.ttf"), 32
+        )
         self.text_font_lg = pg.font.Font(asset_path("fonts/SpaceMono.ttf"), 32)
         self.text_font_md = pg.font.Font(asset_path("fonts/SpaceMono.ttf"), 24)
         self.text_font_sm = pg.font.Font(asset_path("fonts/SpaceMono.ttf"), 18)

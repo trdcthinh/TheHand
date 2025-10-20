@@ -1,14 +1,15 @@
 import threading
 import time
 
+import pygame as pg
+
 from thehand.core import Event, EventCode
 from thehand.core.event import (
     create_next_scene_event,
-    create_open_menu_event,
     create_number_event,
+    create_open_menu_event,
     create_vector_event,
 )
-import pygame as pg
 
 
 def audition_thread_function():
