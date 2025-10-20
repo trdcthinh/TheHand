@@ -14,9 +14,9 @@ from thehand.core.event import (
 
 def audition_thread_function():
     time.sleep(2)
-    pg.event.post(create_open_menu_event("Now, open menu"))
+    pg.event.post(create_open_menu_event())
     time.sleep(2)
-    pg.event.post(create_next_scene_event("Now, next scene"))
+    pg.event.post(create_next_scene_event())
     time.sleep(2)
     pg.event.post(create_number_event(999))
     time.sleep(2)

@@ -1,10 +1,12 @@
 from thehand.core.scene.scene import Scene
 from thehand.core.state import State
+from thehand.core.store import Store
 
 
 class SceneManager:
-    def __init__(self, state: State) -> None:
+    def __init__(self, state: State, store: Store) -> None:
         self._state = state
+        self._store = store
 
         self.scenes: dict[str, Scene] = {}
 

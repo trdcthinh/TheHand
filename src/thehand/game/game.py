@@ -4,14 +4,17 @@ import pygame as pg
 
 from thehand.core import (
     Camera,
+    Event,
+    EventCode,
     FaceLandmarker,
     HandLandmarker,
     PoseLandmarker,
     SceneManager,
     SpeechRecognition,
     State,
+    Store,
 )
-from thehand.core.event import Event, EventCode
+from thehand.game.config import GAME_NAME
 from thehand.game.scene import (
     CreditScene,
     HintScene,
@@ -24,7 +27,13 @@ from thehand.game.scene import (
 
 class TheHandGame:
     def __init__(self) -> None:
+        pg.init()
+        pg.font.init()
+        pg.mixer.init()
+        pg.display.set_caption(GAME_NAME)
+
         self.state = State()
+        self.store = Store()
 
         self.clock = pg.Clock()
         self.vision_clock = pg.Clock()
@@ -38,9 +47,29 @@ class TheHandGame:
         self.hand: HandLandmarker | None = None
         self.pose: PoseLandmarker | None = None
 
-        self.screen: pg.Surface | None = None
+    def init(self) -> None:
+        screen_info = pg.display.Info()
 
-    def __call__(self) -> None:
+        self.state.window_size = (screen_info.current_w, screen_info.current_h)
+        self.store.screen = pg.display.set_mode(
+            self.state.window_size, self.state.display_flag
+        )
+
+        self.scene_manager = SceneManager(self.state, self.store)
+
+        self.sr = SpeechRecognition(self.state)
+
+        self.camera = Camera()
+        self.face = FaceLandmarker()
+        self.hand = HandLandmarker()
+        self.pose = PoseLandmarker()
+
+        self._setup_scenes()
+
+    def run(self) -> None:
+        if not self.scene_manager:
+            raise TypeError("SceneManager is not initialized")
+
         sr_thread = Thread(target=self.sr.run, daemon=True)
         sr_thread.start()
 
@@ -52,41 +81,25 @@ class TheHandGame:
             self.scene_manager()
             self.clock.tick(self.state.FPS)
 
-    def init(self) -> None:
-        self.scene_manager = SceneManager(self.state)
-
-        self.sr = SpeechRecognition(self.state)
-
-        self.camera = Camera()
-        self.face = FaceLandmarker()
-        self.hand = HandLandmarker()
-        self.pose = PoseLandmarker()
-
-        screen_info = pg.display.Info()
-        self.state.window_size = (screen_info.current_w, screen_info.current_h)
-        self.screen = pg.display.set_mode(
-            self.state.window_size, self.state.display_flag
-        )
-
-        self._setup_scenes()
-
     def quit(self) -> None:
         self.sr.stop()
         pg.quit()
+
         print("\n\n\n" + " QUIT GAME ".center(80, "="))
         print("\n\n" + " Thank you for playing our game! ".center(80, "=") + "\n\n")
+
         exit(0)
 
     def _setup_scenes(self) -> None:
-        splash_scene = SplashScene("splash", self.screen, self.state)
-        main_menu_scene = MainMenuScene("main_menu", self.screen, self.state)
-        tutorial_scene = TutorialScene("tutorial", self.screen, self.state)
-        hint_pacman_scene = HintScene("hint_pacman", self.screen, self.state)
-        pacman_scene = PacmanScene("pacman", self.screen, self.state, self.hand)
-        credit_scene = CreditScene("credit", self.screen, self.state)
+        splash_scene = SplashScene("splash", self.state, self.store)
+        main_menu_scene = MainMenuScene("main_menu", self.state, self.store, self.sr)
+        tutorial_scene = TutorialScene("tutorial", self.state, self.store)
+        hint_pacman_scene = HintScene("hint_pacman", self.state, self.store)
+        pacman_scene = PacmanScene("pacman", self.state, self.store, self.hand)
+        credit_scene = CreditScene("credit", self.state, self.store)
 
-        splash_scene >> main_menu_scene >> tutorial_scene
-        tutorial_scene >> main_menu_scene
+        splash_scene >> main_menu_scene >> hint_pacman_scene
+        # tutorial_scene >> main_menu_scene
 
         hint_pacman_scene >> pacman_scene
 
@@ -116,13 +129,27 @@ class TheHandGame:
             if image is None:
                 continue
 
-            self.hand(image)
+            if self.state.hand_running:
+                self.hand(image)
+
+            if self.state.face_running:
+                self.face(image)
+
+            if self.state.pose_running:
+                self.pose(image)
 
             self.vision_clock.tick(self.state.vision_FPS)
 
     def _next_scene(self) -> None:
         success = self.scene_manager.next()
         if not success:
+            print("Failed to get next scene. Quitting.")
+            self.quit()
+
+    def _change_scene(self, scene: str) -> None:
+        success = self.scene_manager.set_current(scene)
+        if not success:
+            print(f"Failed to change to '{scene}' scene. Quitting.")
             self.quit()
 
     def _handle_events(self) -> None:
@@ -132,25 +159,28 @@ class TheHandGame:
             if event.type == pg.QUIT:
                 self.quit()
 
-            if event.type == pg.MOUSEBUTTONUP:
-                self._next_scene()
-
             if event.type == Event.COMMAND.value:
                 if event.code == EventCode.COMMAND_NEXT_SCENE:
                     self._next_scene()
+                if event.code == EventCode.COMMAND_CHANGE_SCENE:
+                    self._change_scene(event.value)
+
+        if self.state.debug_mode:
+            self._debug_handle_events()
+
+    def _debug_handle_events(self) -> None:
+        for event in self.state.events:
+            if event.type == pg.K_KP_ENTER:
+                self._next_scene()
 
 
 def main():
-    pg.init()
-    pg.font.init()
-    pg.display.set_caption("[GAME_NO_NAME]")
-
     game = TheHandGame()
 
     game.state.debug_mode = True
 
     game.init()
-    game()
+    game.run()
 
 
 if __name__ == "__main__":

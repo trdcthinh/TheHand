@@ -1,20 +1,19 @@
 from abc import ABC, abstractmethod
 
-import pygame as pg
-
 from thehand.core.state import State
+from thehand.core.store import Store
 
 
 class Scene(ABC):
     def __init__(
         self,
         name: str,
-        screen: pg.Surface,
         state: State,
+        store: Store,
     ) -> None:
-        self.name: str = name
-        self.screen = screen
-        self.state: State = state
+        self.name = name
+        self.state = state
+        self.store = store
 
         self.next_scene: str = ""
 

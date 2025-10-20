@@ -37,18 +37,18 @@ def create_quit_event() -> pg.event.Event:
     return pg.event.Event(pg.QUIT, {})
 
 
-def create_open_menu_event(value: str = "") -> pg.event.Event:
+def create_open_menu_event() -> pg.event.Event:
     event_data: CommandEventData = {
         "code": EventCode.COMMAND_OPEN_MENU,
-        "value": value,
+        "value": "",
     }
     return pg.event.Event(Event.COMMAND.value, event_data)
 
 
-def create_next_scene_event(value: str = "") -> pg.event.Event:
+def create_next_scene_event() -> pg.event.Event:
     event_data: CommandEventData = {
         "code": EventCode.COMMAND_NEXT_SCENE,
-        "value": value,
+        "value": "",
     }
     return pg.event.Event(Event.COMMAND.value, event_data)
 

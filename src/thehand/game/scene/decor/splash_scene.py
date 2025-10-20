@@ -1,17 +1,18 @@
 import pygame as pg
 
-from thehand.core import Scene, State, asset_path
+from thehand.core import Scene, State, Store, asset_path
 
 
 class SplashScene(Scene):
     def __init__(
         self,
         name: str,
-        screen: pg.Surface,
         state: State,
+        store: Store,
         icon_ratio: float = 0.3,
     ):
-        super().__init__(name, screen, state)
+        super().__init__(name, state, store)
+
         self.image = None
         self.image_rect = None
 
@@ -27,13 +28,15 @@ class SplashScene(Scene):
 
     def setup(self):
         original_image = pg.image.load(
-            asset_path("imgs/thehand_icon.png")
+            asset_path("imgs", "thehand_icon.png")
         ).convert_alpha()
-        new_height = self.screen.get_height() * self.icon_ratio
+        new_height = self.store.screen.get_height() * self.icon_ratio
         aspect_ratio = original_image.get_width() / original_image.get_height()
         new_width = new_height * aspect_ratio
         self.image = pg.transform.smoothscale(original_image, (new_width, new_height))
-        self.image_rect = self.image.get_rect(center=self.screen.get_rect().center)
+        self.image_rect = self.image.get_rect(
+            center=self.store.screen.get_rect().center
+        )
 
     def handle_events(self):
         for event in pg.event.get():
@@ -53,12 +56,12 @@ class SplashScene(Scene):
             self.done = True
 
     def render(self):
-        self.screen.fill((25, 25, 25))
+        self.store.screen.fill((25, 25, 25))
 
         if self.image:
             scaled_image = pg.transform.smoothscale_by(self.image, self.scale)
             scaled_image.set_alpha(self.alpha)
             scaled_rect = scaled_image.get_rect(center=self.image_rect.center)
-            self.screen.blit(scaled_image, scaled_rect)
+            self.store.screen.blit(scaled_image, scaled_rect)
 
         pg.display.flip()

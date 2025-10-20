@@ -5,6 +5,7 @@ from thehand.core.event import EventCode as EventCode
 from thehand.core.scene import Scene as Scene
 from thehand.core.scene import SceneManager as SceneManager
 from thehand.core.state import State as State
+from thehand.core.store import Store as Store
 from thehand.core.utils import (
     asset_path as asset_path,
 )

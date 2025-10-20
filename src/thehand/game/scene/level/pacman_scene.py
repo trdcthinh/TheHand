@@ -3,7 +3,7 @@ import random
 import pygame as pg
 from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
 
-from thehand.core import HandLandmarker, Scene, State, asset_path
+from thehand.core import HandLandmarker, Scene, State, Store, asset_path
 from thehand.core.event import Event, EventCode, create_vector_event
 from thehand.core.store import COLOR_MOCHA_BASE, COLOR_MOCHA_GREEN
 from thehand.core.vision import get_hand_position_on_screen
@@ -13,7 +13,7 @@ from thehand.game.widgets.toast import Toast
 class Collectible(pg.sprite.Sprite):
     def __init__(self, image_path, pos, points, size=(50, 50)):
         super().__init__()
-        self.image = pg.image.load(asset_path(image_path)).convert_alpha()
+        self.image = pg.image.load(image_path).convert_alpha()
         self.image = pg.transform.scale(self.image, size)
         self.rect = self.image.get_rect(center=pos)
         self.points = points
@@ -26,7 +26,7 @@ class Apple(Collectible):
         )
         size = size_points[0][0]
         points = size_points[0][1]
-        super().__init__("imgs/apple.png", pos, points, (size, size))
+        super().__init__(asset_path("imgs", "apple.png"), pos, points, (size, size))
 
 
 class Strawberry(Collectible):
@@ -37,29 +37,33 @@ class Strawberry(Collectible):
         )
         size = size_points[0][0]
         points = size_points[0][1] * 2
-        super().__init__("imgs/strawberry.png", pos, points, (size, size))
+        super().__init__(
+            asset_path("imgs", "strawberry.png"), pos, points, (size, size)
+        )
 
 
 class PacmanScene(Scene):
     def __init__(
         self,
         name: str,
-        screen: pg.Surface,
         state: State,
+        store: Store,
         hand: HandLandmarker,
     ):
-        super().__init__(name, screen, state)
+        super().__init__(name, state, store)
 
         self.hand = hand
 
-        self.pacman = pg.image.load(asset_path("imgs/pacman_right.png")).convert_alpha()
+        self.pacman = pg.image.load(
+            asset_path("imgs", "pacman_right.png")
+        ).convert_alpha()
         self.pacman = pg.transform.scale(self.pacman, (150, 150))
 
         self.pacman_pos = pg.Vector2(
-            self.screen.get_width() / 2, self.screen.get_height() / 2
+            self.store.screen.get_width() / 2, self.store.screen.get_height() / 2
         )
         self.pacman_target_pos = pg.Vector2(
-            self.screen.get_width() / 2, self.screen.get_height() / 2
+            self.store.screen.get_width() / 2, self.store.screen.get_height() / 2
         )
         self.easing = 0.1
 
@@ -136,19 +140,21 @@ class PacmanScene(Scene):
         ]
 
     def render(self):
-        self.screen.fill((25, 25, 25))
+        self.store.screen.fill((25, 25, 25))
 
-        self.collectibles.draw(self.screen)
+        self.collectibles.draw(self.store.screen)
 
-        self.screen.blit(self.pacman, self.pacman.get_rect(center=self.pacman_pos))
+        self.store.screen.blit(
+            self.pacman, self.pacman.get_rect(center=self.pacman_pos)
+        )
 
-        score_text = self.state.text_font_md.render(
+        score_text = self.store.font_text_24.render(
             f"Score: {self.score}", True, (240, 240, 240)
         )
-        self.screen.blit(score_text, (10, 10))
+        self.store.screen.blit(score_text, (10, 10))
 
         for toast in self.toasts:
-            toast.render(self.screen)
+            toast.render(self.store.screen)
 
         pg.display.flip()
 

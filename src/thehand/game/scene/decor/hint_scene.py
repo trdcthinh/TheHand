@@ -1,16 +1,11 @@
 import pygame as pg
 
-from thehand.core import Scene, State
+from thehand.core import Scene, State, Store
 
 
 class HintScene(Scene):
-    def __init__(
-        self,
-        name: str,
-        screen: pg.Surface,
-        state: State,
-    ):
-        super().__init__(name, screen, state)
+    def __init__(self, name: str, state: State, store: Store):
+        super().__init__(name, state, store)
 
     def setup(self):
         return
@@ -22,7 +17,7 @@ class HintScene(Scene):
         return
 
     def render(self):
-        self.screen.fill((25, 25, 25))
-        text = self.state.text_font_md.render(self.name, True, (240, 240, 240))
-        self.screen.blit(text, (100, 100))
+        self.store.screen.fill((25, 25, 25))
+        text = self.store.font_text_24.render(self.name, True, (240, 240, 240))
+        self.store.screen.blit(text, (100, 100))
         pg.display.flip()
