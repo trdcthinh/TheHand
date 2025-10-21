@@ -98,7 +98,7 @@ from .vision import is_hand_horizontal_down as is_hand_horizontal_down
 from .vision import is_hand_horizontal_up as is_hand_horizontal_up
 from .vision import is_hand_index as is_hand_index
 from .vision import is_hand_like as is_hand_like
-from .vision import is_hand_peace as is_hand_peace
+from .vision import is_hand_v as is_hand_v
 from .vision import is_hand_punch as is_hand_punch
 from .vision import is_hand_spider as is_hand_spider
 from .vision import is_hand_v_capture as is_hand_v_capture

@@ -4,7 +4,7 @@ import pygame as pg
 
 import thehand as th
 from thehand.game.configs import GAME_NAME
-from thehand.game.scenes import CreditScene, HintScene, MainMenuScene, MlrsScene, PacmanScene, SplashScene
+from thehand.game.scenes import CreditScene, HintScene, MainMenuScene, MlrsScene, PacmanScene, SplashScene, RPSScene
 
 
 class TheHandGame:
@@ -110,6 +110,9 @@ class TheHandGame:
         self.mlrs_scene = MlrsScene(self.state, self.store, "mlrs")
         self.scene_manager += self.mlrs_scene
 
+        self.rps_scene = RPSScene(self.state, self.store, "rps")
+        self.scene_manager += self.rps_scene
+
         self.credit_scene = CreditScene(self.state, self.store, "credit")
         self.scene_manager += self.credit_scene
 
@@ -120,7 +123,7 @@ class TheHandGame:
         self.hint_pacman_scene >> self.pacman_scene >> self.hint_mlrs_scene
         self.hint_mlrs_scene >> self.mlrs_scene >> self.credit_scene
 
-        self.scene_manager << self.splash_scene
+        self.scene_manager << self.mlrs_scene
 
     def _sr_callback(self, text: str) -> None:
         th.print_inline(text)

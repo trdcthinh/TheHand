@@ -97,7 +97,7 @@ from .core import is_hand_horizontal_down as is_hand_horizontal_down
 from .core import is_hand_horizontal_up as is_hand_horizontal_up
 from .core import is_hand_index as is_hand_index
 from .core import is_hand_like as is_hand_like
-from .core import is_hand_peace as is_hand_peace
+from .core import is_hand_v as is_hand_v
 from .core import is_hand_punch as is_hand_punch
 from .core import is_hand_spider as is_hand_spider
 from .core import is_hand_v_capture as is_hand_v_capture

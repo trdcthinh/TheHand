@@ -104,6 +104,8 @@ class MlrsScene(NovelScene):
     def setup(self):
         super().setup()
 
+        self.store.sounds["ambient_rain"].set_volume(2)
+        self.store.sounds["ambient_rain"].play()
         self.state.set_scene_sr_callback(self._sr_callback)
 
     def handle_events(self):

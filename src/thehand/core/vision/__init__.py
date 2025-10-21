@@ -13,7 +13,7 @@ from .hand_utils import is_hand_horizontal_down as is_hand_horizontal_down
 from .hand_utils import is_hand_horizontal_up as is_hand_horizontal_up
 from .hand_utils import is_hand_index as is_hand_index
 from .hand_utils import is_hand_like as is_hand_like
-from .hand_utils import is_hand_peace as is_hand_peace
+from .hand_utils import is_hand_v as is_hand_v
 from .hand_utils import is_hand_punch as is_hand_punch
 from .hand_utils import is_hand_spider as is_hand_spider
 from .hand_utils import is_hand_v_capture as is_hand_v_capture
