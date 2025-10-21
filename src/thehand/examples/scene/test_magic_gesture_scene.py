@@ -8,8 +8,12 @@ def main():
     state = th.State()
     screen = pg.display.set_mode(state.window_size)
     clock = pg.time.Clock()
-    store = th.Store()  # hoặc None nếu không cần
-    scene = MagicGestureScene("MagicGesture", state, store, screen)
+    store = th.Store()
+    # make store.screen available for scene convenience
+    store.screen = screen
+
+    # New constructor: (state, store, name)
+    scene = MagicGestureScene(state, store, "magic_gesture")
     scene.setup()
     running = True
     while running and not scene.done:
@@ -18,8 +22,6 @@ def main():
         scene.update()
         scene.render()
         clock.tick(state.FPS)
-        if scene.done:
-            running = False
     pg.quit()
 
 
