@@ -7,18 +7,17 @@ from thehand.core.store import Store
 class Scene(ABC):
     def __init__(
         self,
-        name: str,
         state: State,
         store: Store,
+        name: str,
     ) -> None:
-        self.name = name
         self.state = state
         self.store = store
+        self.name = name
 
         self.next_scene: str = ""
 
-        self.have_setup = False
-        self.done = False
+        self._have_setup = False
 
     def __rshift__(self, other: "Scene") -> "Scene":
         self.next_scene = other.name
@@ -39,3 +38,7 @@ class Scene(ABC):
     @abstractmethod
     def render(self) -> None:
         raise NotImplementedError
+
+    def _setup(self) -> None:
+        self.setup()
+        self._have_setup = True

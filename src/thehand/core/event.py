@@ -1,52 +1,16 @@
-from enum import Enum
-from typing import TypedDict
-
 import pygame as pg
 
+from .types import TheHandEventData
 
-class Event(Enum):
-    COMMAND = pg.USEREVENT + 1
-    VALUE = pg.USEREVENT + 2
+THEHAND_EVENT = pg.USEREVENT + 79
 
-
-class EventCode(Enum):
-    COMMAND_OPEN_MENU = 101
-    COMMAND_NEXT_SCENE = 105
-    COMMAND_CHANGE_SCENE = 106
-    VALUE_BOOL = 301
-    VALUE_STRING = 302
-    VALUE_NUMBER = 303
-    VALUE_VECTOR = 300
-
-
-class CommandEventData(TypedDict):
-    code: EventCode
-
-
-class ChangeSceneEventData(TypedDict):
-    code: EventCode
-    scene: str
-
-
-class VectorEventData(TypedDict):
-    code: EventCode
-    x: float
-    y: float
-
-
-class NumberEventData(TypedDict):
-    code: EventCode
-    value: float
-
-
-class BoolEventData(TypedDict):
-    code: EventCode
-    value: bool
-
-
-class StringEventData(TypedDict):
-    code: EventCode
-    value: str
+C_OPEN_MENU = 101
+C_NEXT_SCENE = 105
+C_CHANGE_SCENE = 106
+C_BOOL = 301
+C_STRING = 302
+C_NUMBER = 303
+C_VECTOR = 300
 
 
 def create_quit_event() -> pg.event.Event:
@@ -54,55 +18,35 @@ def create_quit_event() -> pg.event.Event:
 
 
 def create_open_menu_event() -> pg.event.Event:
-    event_data: CommandEventData = {
-        "code": EventCode.COMMAND_OPEN_MENU,
-    }
-    return pg.event.Event(Event.COMMAND.value, event_data)
+    event_data: TheHandEventData = {"code": C_OPEN_MENU, "value": "", "seed": 0}
+    return pg.event.Event(THEHAND_EVENT, event_data)
 
 
 def create_next_scene_event() -> pg.event.Event:
-    event_data: CommandEventData = {
-        "code": EventCode.COMMAND_NEXT_SCENE,
-    }
-    return pg.event.Event(Event.COMMAND.value, event_data)
+    event_data: TheHandEventData = {"code": C_NEXT_SCENE, "value": "", "seed": 0}
+    return pg.event.Event(THEHAND_EVENT, event_data)
 
 
 def create_change_scene_event(scene: str) -> pg.event.Event:
-    event_data: ChangeSceneEventData = {
-        "code": EventCode.COMMAND_CHANGE_SCENE,
-        "scene": scene,
-    }
-    return pg.event.Event(Event.COMMAND.value, event_data)
+    event_data: TheHandEventData = {"code": C_CHANGE_SCENE, "value": scene, "seed": 0}
+    return pg.event.Event(THEHAND_EVENT, event_data)
 
 
-def create_bool_event(value: bool) -> pg.event.Event:
-    event_data: BoolEventData = {
-        "code": EventCode.VALUE_BOOL,
-        "value": value,
-    }
-    return pg.event.Event(Event.VALUE.value, event_data)
+def create_bool_event(value: bool, seed: int = 0) -> pg.event.Event:
+    event_data: TheHandEventData = {"code": C_BOOL, "value": value, "seed": seed}
+    return pg.event.Event(THEHAND_EVENT, event_data)
 
 
-def create_string_event(value: str) -> pg.event.Event:
-    event_data: StringEventData = {
-        "code": EventCode.VALUE_BOOL,
-        "value": value,
-    }
-    return pg.event.Event(Event.VALUE.value, event_data)
+def create_string_event(value: str, seed: int = 0) -> pg.event.Event:
+    event_data: TheHandEventData = {"code": C_STRING, "value": value, "seed": seed}
+    return pg.event.Event(THEHAND_EVENT, event_data)
 
 
-def create_number_event(value: float) -> pg.event.Event:
-    event_data: NumberEventData = {
-        "code": EventCode.VALUE_NUMBER,
-        "value": value,
-    }
-    return pg.event.Event(Event.VALUE.value, event_data)
+def create_number_event(value: float, seed: int = 0) -> pg.event.Event:
+    event_data: TheHandEventData = {"code": C_NUMBER, "value": value, "seed": seed}
+    return pg.event.Event(THEHAND_EVENT, event_data)
 
 
-def create_vector_event(x: float, y: float) -> pg.event.Event:
-    event_data: VectorEventData = {
-        "code": EventCode.VALUE_VECTOR,
-        "x": x,
-        "y": y,
-    }
-    return pg.event.Event(Event.VALUE.value, event_data)
+def create_vector_event(vec: tuple[float, float], seed: int = 0) -> pg.event.Event:
+    event_data: TheHandEventData = {"code": C_VECTOR, "value": vec, "seed": seed}
+    return pg.event.Event(THEHAND_EVENT, event_data)

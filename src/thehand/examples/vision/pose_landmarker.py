@@ -4,8 +4,7 @@ from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks.python.vision.pose_landmarker import PoseLandmarkerResult
 
-from thehand.core import Camera, PoseLandmarker
-from thehand.core.vision import is_arm_joint_close
+import thehand as th
 
 detection_result = None
 
@@ -28,8 +27,8 @@ def result_callback(result: PoseLandmarkerResult):
         if len(landmarks) < 21:
             continue
 
-        res = is_arm_joint_close(landmarks)
-        # print(res)
+        res = th.is_arm_joint_close(landmarks)
+        print(res)
 
 
 def draw(rgb_image, detection_result):
@@ -43,12 +42,7 @@ def draw(rgb_image, detection_result):
         # Draw the pose landmarks.
         pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
         pose_landmarks_proto.landmark.extend(
-            [
-                landmark_pb2.NormalizedLandmark(
-                    x=landmark.x, y=landmark.y, z=landmark.z
-                )
-                for landmark in pose_landmarks
-            ]
+            [landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in pose_landmarks]
         )
         solutions.drawing_utils.draw_landmarks(
             annotated_image,
@@ -60,8 +54,8 @@ def draw(rgb_image, detection_result):
 
 
 def main():
-    camera = Camera()
-    hand = PoseLandmarker(result_callback)
+    camera = th.Camera()
+    hand = th.PoseLandmarker(result_callback)
 
     while True:
         image = camera.read()

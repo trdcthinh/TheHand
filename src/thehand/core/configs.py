@@ -1,6 +1,6 @@
 DEFAULT_WINDOW_SIZE: tuple[int, int] = (1280, 720)
 
-CAMERA_FRAME_SIZE: tuple[int, int] = (1280, 720)
+DEFAULT_FRAME_SIZE: tuple[int, int] = (960, 640)
 
 FACE_LANDMARKER_MODEL = "models/face_landmarker.task"
 NUM_FACE_DETECTED = 1

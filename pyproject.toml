@@ -25,6 +25,8 @@ project-excludes = [
     '**/*venv/**\*',
 ]
 
+[tool.ruff]
+line-length = 120
 
 [tool.ty.rules]
 unresolved-attribute = "ignore"

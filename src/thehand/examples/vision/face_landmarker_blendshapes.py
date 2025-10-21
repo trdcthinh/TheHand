@@ -95,9 +95,7 @@ def run(
     while cap.isOpened():
         success, image = cap.read()
         if not success:
-            sys.exit(
-                "ERROR: Unable to read from webcam. Please verify your webcam settings."
-            )
+            sys.exit("ERROR: Unable to read from webcam. Please verify your webcam settings.")
 
         image = cv2.flip(image, 1)
 
@@ -129,9 +127,7 @@ def run(
                 face_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
                 face_landmarks_proto.landmark.extend(
                     [
-                        landmark_pb2.NormalizedLandmark(
-                            x=landmark.x, y=landmark.y, z=landmark.z
-                        )
+                        landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z)
                         for landmark in face_landmarks
                     ]
                 )
@@ -171,13 +167,9 @@ def run(
 
         if DETECTION_RESULT:
             # Define parameters for the bars and text
-            legend_x = (
-                current_frame.shape[1] - label_padding_width + 20
-            )  # Starting X-coordinate (20 as a margin)
+            legend_x = current_frame.shape[1] - label_padding_width + 20  # Starting X-coordinate (20 as a margin)
             legend_y = 30  # Starting Y-coordinate
-            bar_max_width = (
-                label_padding_width - 40
-            )  # Max width of the bar with some margin
+            bar_max_width = label_padding_width - 40  # Max width of the bar with some margin
             bar_height = 8  # Height of the bar
             gap_between_bars = 5  # Gap between two bars
             text_gap = 5  # Gap between the end of the text and the start of the bar
@@ -191,9 +183,7 @@ def run(
 
                     # Prepare text and get its width
                     text = "{} ({:.2f})".format(category_name, score)
-                    (text_width, _), _ = cv2.getTextSize(
-                        text, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1
-                    )
+                    (text_width, _), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)
 
                     # Display the blendshape name and score
                     cv2.putText(

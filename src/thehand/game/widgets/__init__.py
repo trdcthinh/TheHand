@@ -1,2 +1,4 @@
-from thehand.game.widgets.button import Button as Button
-from thehand.game.widgets.toast import Toast as Toast
+from .button import Button as Button
+from .noise import Noise as Noise
+from .player_speech import PlayerSpeech as PlayerSpeech
+from .toast import Toast as Toast

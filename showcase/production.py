@@ -1,8 +1,8 @@
-from thehand import TheHandGame
+import thehand as th
 
 
 def main():
-    game = TheHandGame()
+    game = th.game.TheHandGame()
     game.init()
     game.run()
 
