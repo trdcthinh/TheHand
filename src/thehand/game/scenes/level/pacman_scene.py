@@ -148,8 +148,8 @@ class PacmanScene(th.Scene):
 
         self.store.screen.blit(self.scaled_pacman, self.pacman_image.get_rect(center=self.pacman_pos))
 
-        score_text = self.store.font_text_24.render(f"Score: {self.score}", True, (240, 240, 240))
-        self.store.screen.blit(score_text, (10, 10))
+        score_text = self.store.font_display_48.render(str(self.score), True, th.COLOR_MOCHA_TEXT)
+        self.store.screen.blit(score_text, (60, 60))
 
         for toast in self.toasts:
             toast.render()

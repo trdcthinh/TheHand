@@ -84,13 +84,25 @@ class TheHandGame:
         self.main_menu_scene = MainMenuScene(self.state, self.store, "main_menu")
         self.scene_manager += self.main_menu_scene
 
-        self.hint_pacman_scene = HintScene(self.state, self.store, "hint_pacman")
+        self.hint_pacman_scene = HintScene(
+            self.state,
+            self.store,
+            "hint_pacman",
+            th.asset_path("imgs", "pacman_bg.jpg"),
+            "Reach 10000 score to win :>",
+        )
         self.scene_manager += self.hint_pacman_scene
 
         self.pacman_scene = PacmanScene(self.state, self.store, "pacman")
         self.scene_manager += self.pacman_scene
 
-        self.hint_mlrs_scene = HintScene(self.state, self.store, "hint_mlrs")
+        self.hint_mlrs_scene = HintScene(
+            self.state,
+            self.store,
+            "hint_mlrs",
+            th.asset_path("imgs", "flying-comets.jpg"),
+            "Like comets in the sky...",
+        )
         self.scene_manager += self.hint_mlrs_scene
 
         self.mlrs_scene = MlrsScene(self.state, self.store, "mlrs")
