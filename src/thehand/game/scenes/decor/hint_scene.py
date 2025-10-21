@@ -1,77 +1,75 @@
+import pygame as pg
+from typing import Optional, Tuple
+
 import thehand as th
 
 
-<<<<<<< HEAD:src/thehand/game/scene/decor/hint_scene.py
-class HintScene(Scene):
+class HintScene(th.Scene):
+    """Scene that shows a static background and a single hint line at the bottom corner.
+
+    Accepts optional `background_path` (image file) and `hint_text`.
+    """
+
     def __init__(
         self,
         name: str,
-        state: State,
-        store: Store,
-        background_path: str | None = None,
+        state: th.State,
+        store: th.Store,
+        background_path: Optional[str] = None,
         hint_text: str = "HINT",
-        text_color: tuple[int, int, int] = (240, 240, 240),
-    ):
-=======
-class HintScene(th.Scene):
-    def __init__(self, name: str, state: th.State, store: th.Store):
->>>>>>> 2e70353244bc5f403f626c6aec789fe818477d33:src/thehand/game/scenes/decor/hint_scene.py
+        text_color: Tuple[int, int, int] = (240, 240, 240),
+        align: str = "left",
+    ) -> None:
         super().__init__(name, state, store)
         self.background_path = background_path
         self.hint_text = hint_text
         self.text_color = text_color
+        self.align = align if align in ("left", "right") else "left"
 
-        self.background = None  # Surface
+        self.background: Optional[pg.Surface] = None
 
-    def setup(self):
-        """Khởi tạo ảnh nền (nếu có)."""
+    def setup(self) -> None:
+        """Load and scale background image if provided."""
         if self.background_path:
             try:
-                self.background = pg.image.load(self.background_path).convert()
-                self.background = pg.transform.scale(
-                    self.background,
-                    self.store.screen.get_size(),
-                )
+                img = pg.image.load(self.background_path)
+                self.background = pg.transform.scale(img, self.store.screen.get_size()).convert()
             except Exception as e:
                 print(f"[HintScene] Không thể tải background: {e}")
                 self.background = None
 
         self.have_setup = True
 
-    def handle_events(self):
-        """Xử lý sự kiện — tạm thời chỉ cho thoát bằng ESC."""
+    def handle_events(self) -> None:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.done = True
             elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 self.done = True
 
-    def update(self):
-        """Không cần cập nhật gì trong scene tĩnh."""
+    def update(self) -> None:
         pass
 
-    def render(self):
-<<<<<<< HEAD:src/thehand/game/scene/decor/hint_scene.py
+    def render(self) -> None:
         screen = self.store.screen
         screen.fill((25, 25, 25))
 
-        # vẽ background nếu có
         if self.background:
             screen.blit(self.background, (0, 0))
 
-        # vẽ dòng chữ ở góc dưới
-        font = self.store.font_text_24
+        # draw bottom-corner hint text
+        font = getattr(self.store, "font_text_24", None)
+        if font is None:
+            font = pg.font.SysFont(None, 24)
+
         text_surface = font.render(self.hint_text, True, self.text_color)
         text_rect = text_surface.get_rect()
-        text_rect.bottomleft = (
-            10,
-            screen.get_height() - 10,
-        )
+        padding = 10
+        if self.align == "left":
+            text_rect.bottomleft = (padding, screen.get_height() - padding)
+        else:
+            text_rect.bottomright = (screen.get_width() - padding, screen.get_height() - padding)
+
         screen.blit(text_surface, text_rect)
 
         pg.display.flip()
-=======
-        self.store.screen.fill((25, 25, 25))
-        text = self.store.font_text_24.render(self.name, True, (240, 240, 240))
-        self.store.screen.blit(text, (100, 100))
->>>>>>> 2e70353244bc5f403f626c6aec789fe818477d33:src/thehand/game/scenes/decor/hint_scene.py
