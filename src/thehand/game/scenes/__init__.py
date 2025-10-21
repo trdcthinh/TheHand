@@ -5,3 +5,4 @@ from .decor import HintScene as HintScene
 from .decor import SplashScene as SplashScene
 from .level import MlrsScene as MlrsScene
 from .level import PacmanScene as PacmanScene
+from .level import RPSScene as RPSScene

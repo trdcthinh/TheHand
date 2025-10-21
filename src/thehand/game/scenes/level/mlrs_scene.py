@@ -104,6 +104,8 @@ class MlrsScene(NovelScene):
     def setup(self):
         super().setup()
 
+        self.store.sounds["ambient_rain"].set_volume(2)
+        self.store.sounds["ambient_rain"].play()
         self.state.set_scene_sr_callback(self._sr_callback)
 
     def handle_events(self):
@@ -119,9 +121,6 @@ class MlrsScene(NovelScene):
 
     def render(self):
         super().render()
-
-        if self.pages[self.current_page_index].name == "wait":
-            self.noise.render()
 
     def _fire_callback(self, text: str):
         if "fire" in text.lower():

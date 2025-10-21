@@ -5,7 +5,6 @@ import pygame as pg
 from PIL import Image
 
 import thehand as th
-from thehand.game.widgets import PlayerSpeech
 
 
 class MainMenuScene(th.Scene):
@@ -46,8 +45,6 @@ class MainMenuScene(th.Scene):
         self.last_spoken = ""
 
         self._start_button_pressed = False
-
-        self.player_speech = PlayerSpeech(self.state, self.store)
 
     def setup(self):
         self.state.set_scene_sr_callback(self._sr_callback)
@@ -95,11 +92,7 @@ class MainMenuScene(th.Scene):
             )
             self.store.screen.blit(subtitle_surf, subtitle_rect)
 
-        self.player_speech.render()
-
     def _sr_callback(self, text):
-        self.player_speech.text = text
-
         if not text:
             return
 

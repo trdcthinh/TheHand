@@ -131,6 +131,7 @@ class Store:
         }
 
         self.sounds: dict[str, pg.mixer.Sound] = {
+            "ambient_rain": pg.mixer.Sound(asset_path("audio", "ambient_rain.mp3")),
             "auughhh": pg.mixer.Sound(asset_path("audio", "auughhh.mp3")),
             "button_launch": pg.mixer.Sound(asset_path("audio", "button_launch.mp3")),
             "danger_alarm": pg.mixer.Sound(asset_path("audio", "danger_alarm.mp3")),
