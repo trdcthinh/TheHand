@@ -1,28 +1,22 @@
-import pygame as pg
-
 import thehand as th
 
 
-class PlayerSpeech(th.Entity):
+class Noise(th.Entity):
     def __init__(
         self,
         state: th.State,
         store: th.Store,
         pos: tuple[int, int] = (50, 50),
-        font: pg.font.Font | None = None,
         color: tuple[int, int, int] = th.COLOR_MOCHA_TEXT,
-        bg_color: tuple[int, int, int] = th.COLOR_MOCHA_BASE,
-        bg_opacity: float = 0.75,
     ) -> None:
         super().__init__(state, store)
 
         self.pos = pos
-        self.font = self.store.font_text_32 if font is None else font
         self.color = color
-        self.bg_color = bg_color
-        self.bg_opacity = bg_opacity
 
         self.text = ""
+        self.step = 500
+        self._last_update = 0
 
     def setup(self) -> None:
         return
@@ -31,9 +25,11 @@ class PlayerSpeech(th.Entity):
         return
 
     def update(self) -> None:
-        return
+        if self.state.now - self.step > self._last_update:
+            self._last_update = self.state.now
+            self.text = th.generate_noise_string()
 
     def render(self) -> None:
-        text_sur = self.font.render(self.text, True, self.color)
+        text_sur = self.store.font_pixel_24.render(self.text, True, self.color)
         text_rect = text_sur.get_rect(center=self.pos)
         self.store.screen.blit(text_sur, text_rect)

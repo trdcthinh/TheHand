@@ -136,21 +136,30 @@ class MainMenuScene(th.Scene):
         self.active_btn = btn_name
         self.active_btn_time = pg.time.get_ticks()
 
-    def _delayed_start(self):
-        def set_done():
+    def _delayed_next_scene(self):
+        def next_scene():
             time.sleep(1)
             pg.event.post(th.create_next_scene_event())
 
-        Thread(target=set_done, daemon=True).start()
+        Thread(target=next_scene, daemon=True).start()
+
+    def _delayed_quit(self):
+        def quit():
+            time.sleep(1.5)
+            pg.event.post(th.create_quit_event())
+
+        Thread(target=quit, daemon=True).start()
 
     def _press_start_button(self):
         if self._start_button_pressed:
             return
 
+        self.store.sounds["button_launch"].play()
         self._start_button_pressed = True
         self._activate_button("start")
-        self._delayed_start()
+        self._delayed_next_scene()
 
     def _press_quit_button(self):
+        self.store.sounds["green_screen"].play()
         self._activate_button("quit")
-        pg.event.post(th.create_quit_event())
+        self._delayed_quit()

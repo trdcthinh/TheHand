@@ -1,8 +1,9 @@
+import random
+
 import pygame as pg
 
 import thehand as th
 from thehand.game.scenes.common import NovelScene, Page
-from thehand.game.widgets import PlayerSpeech
 
 
 class MlrsScene(NovelScene):
@@ -73,6 +74,7 @@ class MlrsScene(NovelScene):
                 "wait",
                 self._fire_callback,
                 store.imgs["mlrs_00"],
+                'Nói đi. Nói "Firrreeee!!!" ý.',
                 infinity=True,
             ),
             Page(
@@ -99,8 +101,6 @@ class MlrsScene(NovelScene):
 
         super().__init__(name, state, store, pages)
 
-        self.speech = PlayerSpeech(self.state, self.store)
-
     def setup(self):
         super().setup()
 
@@ -117,12 +117,11 @@ class MlrsScene(NovelScene):
     def update(self):
         super().update()
 
-        self.speech.update()
-
     def render(self):
         super().render()
 
-        self.speech.render()
+        if self.pages[self.current_page_index].name == "wait":
+            self.noise.render()
 
     def _fire_callback(self, text: str):
         if "fire" in text.lower():
@@ -130,7 +129,9 @@ class MlrsScene(NovelScene):
             if speech_volume > 0.04:
                 self.next_page()
             else:
-                th.print_inline("Too weak!")
+                self.pages[self.current_page_index].text = "Nói nhỏ quá..."
+        elif text:
+            self.pages[self.current_page_index].text = "." * random.randrange(3, 9)
 
     def _sr_callback(self, text: str):
         th.print_inline(text)

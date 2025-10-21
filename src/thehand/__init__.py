@@ -1,3 +1,4 @@
+from . import game as game
 from .core import C_BOOL as C_BOOL
 from .core import C_CHANGE_SCENE as C_CHANGE_SCENE
 from .core import C_NEXT_SCENE as C_NEXT_SCENE
@@ -108,4 +109,3 @@ from .core import is_smile as is_smile
 from .core import normalized_landmarks_to_coordinates as normalized_landmarks_to_coordinates
 from .core import normalized_to_pixel_coordinates as normalized_to_pixel_coordinates
 from .core import print_inline as print_inline
-from . import game as game

@@ -92,10 +92,15 @@ class Store:
         self.font_text_18 = pg.font.Font(asset_path("fonts", "SpaceMono.ttf"), 18)
 
         self.font_pixel_36 = pg.font.Font(asset_path("fonts", "PixeloidSansBold.ttf"), 36)
+        self.font_pixel_24 = pg.font.Font(asset_path("fonts", "PixeloidSansBold.ttf"), 24)
+        self.font_pixel_18 = pg.font.Font(asset_path("fonts", "PixeloidSansBold.ttf"), 18)
 
         self.imgs: dict[str, pg.Surface] = {
+            "flying_comets": pg.image.load(asset_path("imgs", "flying_comets.jpg")),
             "mlrs_00": pg.image.load(asset_path("imgs", "mlrs_00.jpg")),
             "mlrs_01": pg.image.load(asset_path("imgs", "mlrs_01.jpg")),
+            "pacman_bg_gray": pg.image.load(asset_path("imgs", "pacman_bg_gray.jpg")),
+            "pacman_bg": pg.image.load(asset_path("imgs", "pacman_bg.jpg")),
             "tutorial_00_00": pg.image.load(asset_path("imgs", "tutorial_00_00.jpg")),
             "tutorial_00_01": pg.image.load(asset_path("imgs", "tutorial_00_01.jpg")),
             "tutorial_00_02": pg.image.load(asset_path("imgs", "tutorial_00_02.jpg")),
@@ -107,6 +112,11 @@ class Store:
             "tutorial_02_01": pg.image.load(asset_path("imgs", "tutorial_02_01.jpg")),
             "tutorial_02_02": pg.image.load(asset_path("imgs", "tutorial_02_02.jpg")),
             "apple": pg.image.load(asset_path("imgs", "apple.png")),
+            "ghost_blinky": pg.image.load(asset_path("imgs", "ghost_blinky.png")),
+            "ghost_blue": pg.image.load(asset_path("imgs", "ghost_blue.png")),
+            "ghost_clyde": pg.image.load(asset_path("imgs", "ghost_clyde.png")),
+            "ghost_inky": pg.image.load(asset_path("imgs", "ghost_inky.png")),
+            "ghost_pinky": pg.image.load(asset_path("imgs", "ghost_pinky.png")),
             "pacman_close_down": pg.image.load(asset_path("imgs", "pacman_close_down.png")),
             "pacman_close_left": pg.image.load(asset_path("imgs", "pacman_close_left.png")),
             "pacman_close_right": pg.image.load(asset_path("imgs", "pacman_close_right.png")),
@@ -122,9 +132,12 @@ class Store:
 
         self.sounds: dict[str, pg.mixer.Sound] = {
             "auughhh": pg.mixer.Sound(asset_path("audio", "auughhh.mp3")),
+            "button_launch": pg.mixer.Sound(asset_path("audio", "button_launch.mp3")),
             "danger_alarm": pg.mixer.Sound(asset_path("audio", "danger_alarm.mp3")),
             "error": pg.mixer.Sound(asset_path("audio", "error.mp3")),
             "fbi_open_up": pg.mixer.Sound(asset_path("audio", "fbi_open_up.mp3")),
+            "fire_in_the_hole": pg.mixer.Sound(asset_path("audio", "fire_in_the_hole.mp3")),
+            "green_screen": pg.mixer.Sound(asset_path("audio", "green_screen.mp3")),
             "gta_v_death": pg.mixer.Sound(asset_path("audio", "gta_v_death.mp3")),
             "gun": pg.mixer.Sound(asset_path("audio", "gun.mp3")),
             "heavy_eating": pg.mixer.Sound(asset_path("audio", "heavy_eating.mp3")),
@@ -136,9 +149,13 @@ class Store:
             "mlrs_05_launch": pg.mixer.Sound(asset_path("audio", "mlrs_05_launch.mp3")),
             "mlrs_06_weldone": pg.mixer.Sound(asset_path("audio", "mlrs_06_weldone.mp3")),
             "munch": pg.mixer.Sound(asset_path("audio", "munch.mp3")),
+            "pacman_start": pg.mixer.Sound(asset_path("audio", "pacman_start.mp3")),
+            "pacman_theme": pg.mixer.Sound(asset_path("audio", "pacman_theme.mp3")),
+            "pacman_victory": pg.mixer.Sound(asset_path("audio", "pacman_victory.mp3")),
             "punch_gaming": pg.mixer.Sound(asset_path("audio", "punch_gaming.mp3")),
             "shocked": pg.mixer.Sound(asset_path("audio", "shocked.mp3")),
             "spiderman": pg.mixer.Sound(asset_path("audio", "spiderman_meme_song.mp3")),
             "tf_nemesis": pg.mixer.Sound(asset_path("audio", "tf_nemesis.mp3")),
             "vine_boom": pg.mixer.Sound(asset_path("audio", "vine_boom.mp3")),
+            "windows_xp_startup": pg.mixer.Sound(asset_path("audio", "windows_xp_startup.mp3")),
         }

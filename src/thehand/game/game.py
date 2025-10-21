@@ -88,8 +88,9 @@ class TheHandGame:
             self.state,
             self.store,
             "hint_pacman",
-            th.asset_path("imgs", "pacman_bg.jpg"),
-            "Reach 10000 score to win :>",
+            self.store.imgs["pacman_bg"],
+            self.store.sounds["pacman_start"],
+            "Reach 10000 score to win!",
         )
         self.scene_manager += self.hint_pacman_scene
 
@@ -100,7 +101,8 @@ class TheHandGame:
             self.state,
             self.store,
             "hint_mlrs",
-            th.asset_path("imgs", "flying-comets.jpg"),
+            self.store.imgs["flying_comets"],
+            self.store.sounds["fire_in_the_hole"],
             "Like comets in the sky...",
         )
         self.scene_manager += self.hint_mlrs_scene
