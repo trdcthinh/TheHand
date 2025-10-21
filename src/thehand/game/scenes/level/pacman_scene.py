@@ -98,7 +98,7 @@ class PacmanScene(th.Scene):
         self.pacman_pos.x += velocity.x * self.easing
         self.pacman_pos.y += velocity.y * self.easing
 
-        state = "close_" if self.score > 5000 else ""
+        state = "close_" if (self.state.now // 500) % 2 == 0 else ""
         self.pacman_image = self.pacman_images[state + self.pacman_direction]
 
         scale_factor = 3 * min(self.score, 10000) / 10000 + 1
