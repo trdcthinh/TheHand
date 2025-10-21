@@ -4,7 +4,7 @@ import pygame as pg
 
 import thehand as th
 from thehand.game.configs import GAME_NAME
-from thehand.game.scenes import CreditScene, HintScene, MainMenuScene, MlrsScene, PacmanScene, SplashScene, RPSScene
+from thehand.game.scenes import CreditScene, HintScene, MainMenuScene, MlrsScene, PacmanScene, RPSScene, SplashScene
 
 
 class TheHandGame:

@@ -69,6 +69,17 @@ def is_hand_point(landmarks: list[Landmark]) -> bool:
     )
 
 
+def is_hand_fuck(landmarks: list[Landmark]) -> bool:
+    return (
+        is_hand_vertical_up(landmarks)
+        and not is_thumb_open(landmarks)
+        and is_index_close(landmarks)
+        and is_middle_open(landmarks)
+        and is_ring_close(landmarks)
+        and is_pinky_close(landmarks)
+    )
+
+
 def is_hand_index(landmarks: list[Landmark]) -> bool:
     return (
         is_hand_vertical_up(landmarks)
@@ -139,7 +150,7 @@ def is_hand_spider(landmarks: list[Landmark]) -> bool:
 def is_hand_promise(landmarks: list[Landmark]) -> bool:
     return (
         not is_thumb_open(landmarks)
-        and is_index_open(landmarks)
+        and is_index_close(landmarks)
         and is_middle_close(landmarks)
         and is_ring_close(landmarks)
         and is_pinky_open(landmarks)
