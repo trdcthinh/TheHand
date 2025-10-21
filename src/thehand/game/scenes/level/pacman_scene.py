@@ -4,7 +4,6 @@ import pygame as pg
 from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
 
 import thehand as th
-from thehand.game.widgets.toast import Toast
 
 
 class Collectible(pg.sprite.Sprite):
@@ -35,6 +34,119 @@ class Strawberry(Collectible):
         super().__init__(th.asset_path("imgs", "strawberry.png"), pos, points, (size, size))
 
 
+class Ghost(pg.sprite.Sprite):
+    def __init__(self, store: th.Store, pos, speed=2, size=(70, 70)):
+        super().__init__()
+
+        self.store = store
+
+        ghost_images = ["ghost_blinky", "ghost_blue", "ghost_clyde", "ghost_inky", "ghost_pinky"]
+
+        self.image = self.store.imgs[random.choice(ghost_images)].convert_alpha()
+        self.image = pg.transform.scale(self.image, size)
+
+        self.rect = self.image.get_rect(center=pos)
+
+        self.speed = speed
+        self.direction = random.choice(["horizontal", "vertical"])
+        self.points_loss = 500
+
+    def update(self):
+        if self.direction == "horizontal":
+            self.rect.x += self.speed
+            if self.rect.left < 0 or self.rect.right > self.store.screen.get_width():
+                self.speed *= -1
+        else:
+            self.rect.y += self.speed
+            if self.rect.top < 0 or self.rect.bottom > self.store.screen.get_height():
+                self.speed *= -1
+
+
+class Toast(th.Entity):
+    def __init__(
+        self,
+        state: th.State,
+        store: th.Store,
+        pos: tuple[int, int],
+        size: tuple[int, int],
+        text: str,
+        duration: int = 3000,
+        font: pg.font.Font | None = None,
+        color: tuple[int, int, int] = th.COLOR_MOCHA_TEXT,
+        bg_color: tuple[int, int, int] = th.COLOR_MOCHA_BASE,
+        bg_opacity: float = 0.8,
+    ) -> None:
+        super().__init__(state, store)
+
+        self.pos = pos
+        self.size = size
+        self.text = text
+        self.duration = duration
+        self.font = self.store.font_text_24 if font is None else font
+        self.color = color
+        self.bg_color = bg_color
+        self.bg_opacity = bg_opacity
+
+        self.alpha = 0
+        self.scale = 0.5
+        self.animation_state = "HIDDEN"  # HIDDEN, FADE_IN, VISIBLE, FADE_OUT
+        self.start_time = 0
+
+    def setup(self) -> None:
+        pass
+
+    def handle_events(self) -> None:
+        pass
+
+    def update(self) -> None:
+        current_time = pg.time.get_ticks()
+        elapsed_time = current_time - self.start_time
+
+        if self.animation_state == "FADE_IN":
+            if elapsed_time < 500:
+                self.alpha = int((elapsed_time / 500) * 255 * self.bg_opacity)
+                self.scale = 0.5 + (elapsed_time / 500) * 0.5
+            else:
+                self.alpha = int(255 * self.bg_opacity)
+                self.scale = 1.0
+                self.animation_state = "VISIBLE"
+                self.start_time = current_time
+        elif self.animation_state == "VISIBLE":
+            if elapsed_time > self.duration:
+                self.animation_state = "FADE_OUT"
+                self.start_time = current_time
+        elif self.animation_state == "FADE_OUT":
+            if elapsed_time < 500:
+                self.alpha = int((1 - (elapsed_time / 500)) * 255 * self.bg_opacity)
+                self.scale = 1.0 - (elapsed_time / 500) * 0.5
+            else:
+                self.alpha = 0
+                self.scale = 0.5
+                self.animation_state = "HIDDEN"
+
+    def render(self) -> None:
+        if self.animation_state != "HIDDEN":
+            scaled_width = int(self.size[0] * self.scale)
+            scaled_height = int(self.size[1] * self.scale)
+
+            bg_surface = pg.Surface((self.size[0], self.size[1]), pg.SRCALPHA)
+            bg_surface.fill(self.bg_color)
+            bg_surface.set_alpha(self.alpha)
+
+            text_surface = self.font.render(self.text, True, self.color)
+            text_rect = text_surface.get_rect(center=(self.size[0] / 2, self.size[1] / 2))
+            bg_surface.blit(text_surface, text_rect)
+
+            scaled_bg = pg.transform.scale(bg_surface, (scaled_width, scaled_height))
+            rect = scaled_bg.get_rect(center=self.pos)
+
+            self.store.screen.blit(scaled_bg, rect)
+
+    def show(self) -> None:
+        self.animation_state = "FADE_IN"
+        self.start_time = pg.time.get_ticks()
+
+
 class PacmanScene(th.Scene):
     def __init__(
         self,
@@ -55,7 +167,7 @@ class PacmanScene(th.Scene):
             "close_down": pg.image.load(th.asset_path("imgs", "pacman_close_down.png")).convert_alpha(),
         }
         for key, img in self.pacman_images.items():
-            self.pacman_images[key] = pg.transform.scale(img, (100, 100))
+            self.pacman_images[key] = pg.transform.scale(img, (70, 70))
 
         self.pacman_image = self.pacman_images["right"]
         self.scaled_pacman = self.pacman_image
@@ -72,6 +184,12 @@ class PacmanScene(th.Scene):
 
         self.toasts: list[Toast] = []
 
+        self.background = self.store.imgs["pacman_bg_gray"].convert()
+
+        self.eat_0_buffer = None
+        self.eat_1_buffer = None
+        self.eat_2_buffer = None
+
     def setup(self):
         self.state.hand_running = True
         self.state.set_scene_hand_callback(self._hand_callback)
@@ -84,6 +202,9 @@ class PacmanScene(th.Scene):
                     self.pacman_target_pos.y = event.value[1]
 
     def update(self):
+        if self.score > 10000:
+            return
+
         velocity = pg.Vector2(
             (self.pacman_target_pos.x - self.pacman_pos.x),
             (self.pacman_target_pos.y - self.pacman_pos.y),
@@ -98,10 +219,10 @@ class PacmanScene(th.Scene):
         self.pacman_pos.x += velocity.x * self.easing
         self.pacman_pos.y += velocity.y * self.easing
 
-        state = "close_" if self.score > 5000 else ""
+        state = "close_" if (self.state.now // 500) % 2 == 0 else ""
         self.pacman_image = self.pacman_images[state + self.pacman_direction]
 
-        scale_factor = 3 * min(self.score, 10000) / 10000 + 1
+        scale_factor = 2 * min(self.score, 10000) / 10000 + 1
         self.scaled_pacman = pg.transform.scale_by(self.pacman_image, scale_factor)
 
         pacman_sprite = pg.sprite.Sprite()
@@ -111,17 +232,20 @@ class PacmanScene(th.Scene):
         for collectible in collided_collectibles:
             self.score += collectible.points
 
-            pg.mixer.Sound.play(self.store.sounds["munch"])
+            if not self.eat_0_buffer or not self.eat_0_buffer.get_busy():
+                self.eat_0_buffer = pg.mixer.Sound.play(self.store.sounds["munch"])
             if self.score > 2000 and self.score < 5000:
                 if random.random() < 0.5:
-                    pg.mixer.Sound.play(self.store.sounds["heavy_eating"])
+                    if not self.eat_1_buffer or not self.eat_1_buffer.get_busy():
+                        self.eat_1_buffer = pg.mixer.Sound.play(self.store.sounds["heavy_eating"])
             elif self.score > 5000:
                 if random.random() < 0.2:
                     if self.score < 7500:
                         self.store.sounds["auughhh"].set_volume(0.5)
                     else:
                         self.store.sounds["auughhh"].set_volume(1)
-                    pg.mixer.Sound.play(self.store.sounds["auughhh"])
+                    if not self.eat_2_buffer or not self.eat_2_buffer.get_busy():
+                        self.eat_2_buffer = pg.mixer.Sound.play(self.store.sounds["auughhh"])
 
             toast = Toast(
                 self.state,
@@ -131,7 +255,7 @@ class PacmanScene(th.Scene):
                 f"+ {collectible.points}",
                 1000,
                 color=th.COLOR_MOCHA_BASE,
-                bg_color=th.COLOR_MOCHA_GREEN,
+                bg_color=th.COLOR_MOCHA_RED,
             )
             toast.show()
             self.toasts.append(toast)
@@ -142,7 +266,7 @@ class PacmanScene(th.Scene):
         self.toasts = [toast for toast in self.toasts if toast.animation_state != "HIDDEN"]
 
     def render(self):
-        self.store.screen.fill((25, 25, 25))
+        self.store.screen.blit(self.background, (0, 0))
 
         self.collectibles.draw(self.store.screen)
 
@@ -160,7 +284,7 @@ class PacmanScene(th.Scene):
             board.fill((0, 0, 0, 178))
 
             # Image
-            image = self.store.imgs["pacman_down"].convert_alpha()
+            image = self.store.imgs["pacman_right"].convert_alpha()
             image = pg.transform.scale(image, (board_size[1] * 0.5, board_size[1] * 0.5))
             image_rect = image.get_rect(center=(board_size[0] / 2, board_size[1] / 2 - 50))
             board.blit(image, image_rect)

@@ -4,39 +4,31 @@ import thehand as th
 
 
 class HintScene(th.Scene):
-    """Scene that shows a static background and a single hint line at the bottom corner.
-
-    Accepts optional `background_path` (image file) and `hint_text`.
-    """
-
     def __init__(
         self,
         state: th.State,
         store: th.Store,
         name: str,
-        background_path: str | None = None,
-        hint_text: str = "HINT",
+        background: pg.Surface | None = None,
+        sound: pg.mixer.Sound | None = None,
+        text: str = "",
         text_color: tuple[int, int, int] = th.COLOR_MOCHA_TEXT,
         align: str = "left",
     ) -> None:
         super().__init__(state, store, name)
 
-        self.background_path = background_path
-        self.hint_text = hint_text
+        self.background = background
+        self.sound = sound
+        self.text = text
         self.text_color = text_color
         self.align = align if align in ("left", "right") else "left"
 
-        self.background: pg.Surface | None = None
-
     def setup(self) -> None:
-        """Load and scale background image if provided."""
-        if self.background_path:
-            try:
-                img = pg.image.load(self.background_path)
-                self.background = pg.transform.scale(img, self.store.screen.get_size()).convert()
-            except Exception as e:
-                print(f"[HintScene] Không thể tải background: {e}")
-                self.background = None
+        if self.background:
+            self.background = pg.transform.scale(self.background, self.state.window_size).convert()
+
+        if self.sound:
+            self.sound.play()
 
         self._start_timer = self.state.now
 
@@ -58,7 +50,7 @@ class HintScene(th.Scene):
 
         font = self.store.font_text_32
 
-        text_surface = font.render(self.hint_text, True, self.text_color)
+        text_surface = font.render(self.text, True, self.text_color)
         text_rect = text_surface.get_rect()
         padding = 60
         if self.align == "left":

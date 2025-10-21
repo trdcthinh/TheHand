@@ -27,19 +27,14 @@ class Page(th.Entity):
             self.background = pg.transform.smoothscale(self.background, self.state.window_size)
 
         self.text = text
+
+        self.box_height = self.state.window_size[1] // 6
         if self.text:
-            box_height = self.state.window_size[1] // 6
-
-            self.text_sur = self.store.font_text_24.render(self.text, True, th.COLOR_MOCHA_TEXT)
-            self.text_rect = self.text_sur.get_rect(
-                center=(self.state.window_size[0] // 2, self.state.window_size[1] - box_height // 2)
-            )
-
-            self.text_bg_sur = pg.Surface((int(self.state.window_size[0]), box_height)).convert()
+            self.text_bg_sur = pg.Surface((int(self.state.window_size[0]), self.box_height)).convert()
             self.text_bg_sur.fill(th.COLOR_MOCHA_BASE)
             self.text_bg_sur.set_alpha(int(0.3 * 255))
             self.text_bg_rect = self.text_bg_sur.get_rect(
-                center=(self.state.window_size[0] // 2, self.state.window_size[1] - box_height // 2)
+                center=(self.state.window_size[0] // 2, self.state.window_size[1] - self.box_height // 2)
             )
 
         self.sound = sound
@@ -62,6 +57,11 @@ class Page(th.Entity):
         if self.background:
             self.store.screen.blit(self.background, (0, 0))
         if self.text:
+            self.text_sur = self.store.font_text_24.render(self.text, True, th.COLOR_MOCHA_TEXT)
+            self.text_rect = self.text_sur.get_rect(
+                center=(self.state.window_size[0] // 2, self.state.window_size[1] - self.box_height // 2)
+            )
+
             self.store.screen.blit(self.text_bg_sur, self.text_bg_rect)
             self.store.screen.blit(self.text_sur, self.text_rect)
 
