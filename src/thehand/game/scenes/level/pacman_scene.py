@@ -27,7 +27,7 @@ class Apple(Collectible):
 class Strawberry(Collectible):
     def __init__(self, pos):
         size_points = random.choices(
-            [(50, 5), (80, 50), (120, 200), (150, 1000), (300, 5000)],
+            [(50, 5), (80, 50), (120, 100), (150, 500), (300, 2000)],
             [50, 20, 10, 5, 1],
         )
         size = size_points[0][0]
@@ -38,17 +38,28 @@ class Strawberry(Collectible):
 class PacmanScene(th.Scene):
     def __init__(
         self,
-        name: str,
         state: th.State,
         store: th.Store,
-        hand: th.HandLandmarker,
+        name: str,
     ):
-        super().__init__(name, state, store)
+        super().__init__(state, store, name)
 
-        self.hand = hand
+        self.pacman_images = {
+            "right": pg.image.load(th.asset_path("imgs", "pacman_right.png")).convert_alpha(),
+            "left": pg.image.load(th.asset_path("imgs", "pacman_left.png")).convert_alpha(),
+            "up": pg.image.load(th.asset_path("imgs", "pacman_up.png")).convert_alpha(),
+            "down": pg.image.load(th.asset_path("imgs", "pacman_down.png")).convert_alpha(),
+            "close_right": pg.image.load(th.asset_path("imgs", "pacman_close_right.png")).convert_alpha(),
+            "close_left": pg.image.load(th.asset_path("imgs", "pacman_close_left.png")).convert_alpha(),
+            "close_up": pg.image.load(th.asset_path("imgs", "pacman_close_up.png")).convert_alpha(),
+            "close_down": pg.image.load(th.asset_path("imgs", "pacman_close_down.png")).convert_alpha(),
+        }
+        for key, img in self.pacman_images.items():
+            self.pacman_images[key] = pg.transform.scale(img, (100, 100))
 
-        self.pacman = pg.image.load(th.asset_path("imgs", "pacman_right.png")).convert_alpha()
-        self.pacman = pg.transform.scale(self.pacman, (150, 150))
+        self.pacman_image = self.pacman_images["right"]
+        self.scaled_pacman = self.pacman_image
+        self.pacman_direction = "right"
 
         self.pacman_pos = pg.Vector2(self.store.screen.get_width() / 2, self.store.screen.get_height() / 2)
         self.pacman_target_pos = pg.Vector2(self.store.screen.get_width() / 2, self.store.screen.get_height() / 2)
@@ -56,14 +67,14 @@ class PacmanScene(th.Scene):
 
         self.score = 0
         self.collectibles = pg.sprite.Group()
-        self._spawn_margin = int(0.2 * self.state.window_size[1])
+        self._spawn_margin = int(0.3 * self.state.window_size[1])
         self._spawn_initial_collectibles()
 
         self.toasts: list[Toast] = []
 
     def setup(self):
         self.state.hand_running = True
-        self.hand.set_result_callback(self._hand_result_callback)
+        self.state.set_scene_hand_callback(self._hand_callback)
 
     def handle_events(self):
         for event in self.state.events:
@@ -73,15 +84,45 @@ class PacmanScene(th.Scene):
                     self.pacman_target_pos.y = event.value[1]
 
     def update(self):
-        self.pacman_pos.x += (self.pacman_target_pos.x - self.pacman_pos.x) * self.easing
-        self.pacman_pos.y += (self.pacman_target_pos.y - self.pacman_pos.y) * self.easing
+        velocity = pg.Vector2(
+            (self.pacman_target_pos.x - self.pacman_pos.x),
+            (self.pacman_target_pos.y - self.pacman_pos.y),
+        )
+
+        if velocity.magnitude_squared() > 1:
+            if abs(velocity.x) > abs(velocity.y):
+                self.pacman_direction = "right" if velocity.x > 0 else "left"
+            else:
+                self.pacman_direction = "down" if velocity.y > 0 else "up"
+
+        self.pacman_pos.x += velocity.x * self.easing
+        self.pacman_pos.y += velocity.y * self.easing
+
+        state = "close_" if self.score > 5000 else ""
+        self.pacman_image = self.pacman_images[state + self.pacman_direction]
+
+        scale_factor = 3 * min(self.score, 10000) / 10000 + 1
+        self.scaled_pacman = pg.transform.scale_by(self.pacman_image, scale_factor)
 
         pacman_sprite = pg.sprite.Sprite()
-        pacman_sprite.rect = self.pacman.get_rect(center=self.pacman_pos)
+        pacman_sprite.rect = self.scaled_pacman.get_rect(center=self.pacman_pos)
 
         collided_collectibles = pg.sprite.spritecollide(pacman_sprite, self.collectibles, True)
         for collectible in collided_collectibles:
             self.score += collectible.points
+
+            pg.mixer.Sound.play(self.store.sounds["munch"])
+            if self.score > 2000 and self.score < 5000:
+                if random.random() < 0.5:
+                    pg.mixer.Sound.play(self.store.sounds["heavy_eating"])
+            elif self.score > 5000:
+                if random.random() < 0.2:
+                    if self.score < 7500:
+                        self.store.sounds["auughhh"].set_volume(0.5)
+                    else:
+                        self.store.sounds["auughhh"].set_volume(1)
+                    pg.mixer.Sound.play(self.store.sounds["auughhh"])
+
             toast = Toast(
                 self.state,
                 self.store,
@@ -105,7 +146,7 @@ class PacmanScene(th.Scene):
 
         self.collectibles.draw(self.store.screen)
 
-        self.store.screen.blit(self.pacman, self.pacman.get_rect(center=self.pacman_pos))
+        self.store.screen.blit(self.scaled_pacman, self.pacman_image.get_rect(center=self.pacman_pos))
 
         score_text = self.store.font_text_24.render(f"Score: {self.score}", True, (240, 240, 240))
         self.store.screen.blit(score_text, (10, 10))
@@ -113,7 +154,27 @@ class PacmanScene(th.Scene):
         for toast in self.toasts:
             toast.render()
 
-    def _hand_result_callback(self, result: HandLandmarkerResult) -> None:
+        if self.score > 10000:
+            board_size = (self.state.window_size[0] / 2, self.state.window_size[1] / 2)
+            board = pg.Surface(board_size, pg.SRCALPHA)
+            board.fill((0, 0, 0, 178))
+
+            # Image
+            image = self.store.imgs["pacman_down"].convert_alpha()
+            image = pg.transform.scale(image, (board_size[1] * 0.5, board_size[1] * 0.5))
+            image_rect = image.get_rect(center=(board_size[0] / 2, board_size[1] / 2 - 50))
+            board.blit(image, image_rect)
+
+            # Text
+            font = self.store.font_pixel_36
+            text = font.render("Ok, you win.", True, (255, 255, 255))
+            text_rect = text.get_rect(center=(board_size[0] / 2, board_size[1] / 2 + 100))
+            board.blit(text, text_rect)
+
+            board_rect = board.get_rect(center=(self.state.window_size[0] / 2, self.state.window_size[1] / 2))
+            self.store.screen.blit(board, board_rect)
+
+    def _hand_callback(self, result: HandLandmarkerResult) -> None:
         if not result.hand_world_landmarks or len(result.hand_world_landmarks) <= 0:
             return
 

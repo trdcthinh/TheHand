@@ -68,8 +68,11 @@ from .store import COLOR_TEAL as COLOR_TEAL
 from .store import COLOR_WHITE as COLOR_WHITE
 from .store import COLOR_YELLOW as COLOR_YELLOW
 from .store import Store as Store
+from .types import FaceLandmarkerResult as FaceLandmarkerResult
 from .types import FaceResultCallback as FaceResultCallback
+from .types import HandLandmarkerResult as HandLandmarkerResult
 from .types import HandResultCallback as HandResultCallback
+from .types import PoseLandmarkerResult as PoseLandmarkerResult
 from .types import PoseResultCallback as PoseResultCallback
 from .types import SrResultCallback as SrResultCallback
 from .utils import asset_path as asset_path
