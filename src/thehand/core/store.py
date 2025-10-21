@@ -1,7 +1,7 @@
 import pygame as pg
 
-from thehand.core.configs import DEFAULT_WINDOW_SIZE
-from thehand.core.utils import asset_path
+from .configs import DEFAULT_WINDOW_SIZE
+from .utils import asset_path
 
 # ===============================================
 # Standard 8-Bit RGB Color Definitions (0-255)
@@ -83,26 +83,28 @@ class Store:
 
         self.font_sys = pg.font.SysFont("Comic Sans MS", 24)
 
-        self.font_display_64 = pg.font.Font(
-            asset_path("fonts", "MajorMonoDisplay.ttf"), 64
-        )
-        self.font_display_48 = pg.font.Font(
-            asset_path("fonts", "MajorMonoDisplay.ttf"), 48
-        )
-        self.font_display_32 = pg.font.Font(
-            asset_path("fonts", "MajorMonoDisplay.ttf"), 32
-        )
+        self.font_display_64 = pg.font.Font(asset_path("fonts", "MajorMonoDisplay.ttf"), 64)
+        self.font_display_48 = pg.font.Font(asset_path("fonts", "MajorMonoDisplay.ttf"), 48)
+        self.font_display_32 = pg.font.Font(asset_path("fonts", "MajorMonoDisplay.ttf"), 32)
 
         self.font_text_32 = pg.font.Font(asset_path("fonts", "SpaceMono.ttf"), 32)
         self.font_text_24 = pg.font.Font(asset_path("fonts", "SpaceMono.ttf"), 24)
         self.font_text_18 = pg.font.Font(asset_path("fonts", "SpaceMono.ttf"), 18)
 
-        self.font_pixel_36 = pg.font.Font(
-            asset_path("fonts", "PixeloidSansBold.ttf"), 36
-        )
+        self.font_pixel_36 = pg.font.Font(asset_path("fonts", "PixeloidSansBold.ttf"), 36)
 
         self.sounds: dict[str, pg.mixer.Sound] = {
-            "error": pg.mixer.Sound(asset_path("audio", "error.mp3")),
-            "vine_boom": pg.mixer.Sound(asset_path("audio", "vine_boom.mp3")),
             "auughhh": pg.mixer.Sound(asset_path("audio", "auughhh.mp3")),
+            "danger_alarm": pg.mixer.Sound(asset_path("audio", "danger_alarm.mp3")),
+            "error": pg.mixer.Sound(asset_path("audio", "error.mp3")),
+            "fbi_open_up": pg.mixer.Sound(asset_path("audio", "fbi_open_up.mp3")),
+            "gta_v_death": pg.mixer.Sound(asset_path("audio", "gta_v_death.mp3")),
+            "gun": pg.mixer.Sound(asset_path("audio", "gun.mp3")),
+            "mlrs_00": pg.mixer.Sound(asset_path("audio", "mlrs_00.mp3")),
+            "mlrs_01": pg.mixer.Sound(asset_path("audio", "mlrs_01.mp3")),
+            "punch_gaming": pg.mixer.Sound(asset_path("audio", "punch_gaming.mp3")),
+            "shocked": pg.mixer.Sound(asset_path("audio", "shocked.mp3")),
+            "spiderman": pg.mixer.Sound(asset_path("audio", "spiderman_meme_song.mp3")),
+            "tf_nemesis": pg.mixer.Sound(asset_path("audio", "tf_nemesis.mp3")),
+            "vine_boom": pg.mixer.Sound(asset_path("audio", "vine_boom.mp3")),
         }

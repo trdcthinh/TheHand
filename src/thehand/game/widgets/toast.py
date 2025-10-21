@@ -1,31 +1,29 @@
-from typing import Tuple
-
 import pygame as pg
 
-from thehand.core import Entity, State
-from thehand.core.store import COLOR_MOCHA_BASE, COLOR_MOCHA_TEXT
+import thehand as th
 
 
-class Toast(Entity):
+class Toast(th.Entity):
     def __init__(
-        self,
-        x: float,
-        y: float,
-        width: int,
-        height: int,
-        state: State,
-        text: str,
-        duration: int = 3000,  # in milliseconds
-        font: pg.font.Font | None = None,
-        color: Tuple[int, int, int] = COLOR_MOCHA_TEXT,
-        bg_color: Tuple[int, int, int] = COLOR_MOCHA_BASE,
-        bg_opacity: float = 0.8,
+            self,
+            state: th.State,
+            store: th.Store,
+            pos: tuple[int, int],
+            size: tuple[int, int],
+            text: str,
+            duration: int = 3000,
+            font: pg.font.Font | None = None,
+            color: tuple[int, int, int] = th.COLOR_MOCHA_TEXT,
+            bg_color: tuple[int, int, int] = th.COLOR_MOCHA_BASE,
+            bg_opacity: float = 0.8,
     ) -> None:
-        super().__init__(x, y, width, height)
-        self.state = state
+        super().__init__(state, store)
+
+        self.pos = pos
+        self.size = size
         self.text = text
         self.duration = duration
-        self.font = self.state.text_font_md if font is None else font
+        self.font = self.store.font_text_24 if font is None else font
         self.color = color
         self.bg_color = bg_color
         self.bg_opacity = bg_opacity
@@ -38,7 +36,7 @@ class Toast(Entity):
     def setup(self) -> None:
         pass
 
-    def handle_events(self, events: list[pg.Event]) -> None:
+    def handle_events(self) -> None:
         pass
 
     def update(self) -> None:
@@ -67,23 +65,23 @@ class Toast(Entity):
                 self.scale = 0.5
                 self.animation_state = "HIDDEN"
 
-    def render(self, surface: pg.Surface) -> None:
+    def render(self) -> None:
         if self.animation_state != "HIDDEN":
-            scaled_width = int(self.width * self.scale)
-            scaled_height = int(self.height * self.scale)
+            scaled_width = int(self.size[0] * self.scale)
+            scaled_height = int(self.size[1] * self.scale)
 
-            bg_surface = pg.Surface((self.width, self.height), pg.SRCALPHA)
+            bg_surface = pg.Surface((self.size[0], self.size[1]), pg.SRCALPHA)
             bg_surface.fill(self.bg_color)
             bg_surface.set_alpha(self.alpha)
 
             text_surface = self.font.render(self.text, True, self.color)
-            text_rect = text_surface.get_rect(center=(self.width / 2, self.height / 2))
+            text_rect = text_surface.get_rect(center=(self.size[0] / 2, self.size[1] / 2))
             bg_surface.blit(text_surface, text_rect)
 
             scaled_bg = pg.transform.scale(bg_surface, (scaled_width, scaled_height))
-            rect = scaled_bg.get_rect(center=(self.x, self.y))
+            rect = scaled_bg.get_rect(center=self.pos)
 
-            surface.blit(scaled_bg, rect)
+            self.store.screen.blit(scaled_bg, rect)
 
     def show(self) -> None:
         self.animation_state = "FADE_IN"

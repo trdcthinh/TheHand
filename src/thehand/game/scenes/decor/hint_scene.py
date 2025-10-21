@@ -1,8 +1,7 @@
-import pygame as pg
-
-from thehand.core import Scene, State, Store
+import thehand as th
 
 
+<<<<<<< HEAD:src/thehand/game/scene/decor/hint_scene.py
 class HintScene(Scene):
     def __init__(
         self,
@@ -13,6 +12,10 @@ class HintScene(Scene):
         hint_text: str = "HINT",
         text_color: tuple[int, int, int] = (240, 240, 240),
     ):
+=======
+class HintScene(th.Scene):
+    def __init__(self, name: str, state: th.State, store: th.Store):
+>>>>>>> 2e70353244bc5f403f626c6aec789fe818477d33:src/thehand/game/scenes/decor/hint_scene.py
         super().__init__(name, state, store)
         self.background_path = background_path
         self.hint_text = hint_text
@@ -48,6 +51,7 @@ class HintScene(Scene):
         pass
 
     def render(self):
+<<<<<<< HEAD:src/thehand/game/scene/decor/hint_scene.py
         screen = self.store.screen
         screen.fill((25, 25, 25))
 
@@ -66,3 +70,8 @@ class HintScene(Scene):
         screen.blit(text_surface, text_rect)
 
         pg.display.flip()
+=======
+        self.store.screen.fill((25, 25, 25))
+        text = self.store.font_text_24.render(self.name, True, (240, 240, 240))
+        self.store.screen.blit(text, (100, 100))
+>>>>>>> 2e70353244bc5f403f626c6aec789fe818477d33:src/thehand/game/scenes/decor/hint_scene.py

@@ -4,8 +4,7 @@ from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks.python.vision.hand_landmarker import HandLandmarkerResult
 
-from thehand.core import Camera, HandLandmarker
-from thehand.core.vision import get_hand_position_on_screen
+import thehand as th
 
 detection_result = None
 
@@ -28,7 +27,7 @@ def result_callback(result: HandLandmarkerResult):
                 if len(landmarks) < 21:
                     continue
 
-                pos = get_hand_position_on_screen(result.hand_landmarks[i], 1980, 1080)
+                pos = th.get_hand_position_on_screen(result.hand_landmarks[i], 1980, 1080)
                 print(pos)
 
 
@@ -44,12 +43,7 @@ def draw(rgb_image, detection_result):
         # Draw the hand landmarks.
         hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
         hand_landmarks_proto.landmark.extend(
-            [
-                landmark_pb2.NormalizedLandmark(
-                    x=landmark.x, y=landmark.y, z=landmark.z
-                )
-                for landmark in hand_landmarks
-            ]
+            [landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks]
         )
         solutions.drawing_utils.draw_landmarks(
             annotated_image,
@@ -82,8 +76,8 @@ def draw(rgb_image, detection_result):
 
 
 def main():
-    camera = Camera()
-    hand = HandLandmarker(result_callback)
+    camera = th.Camera()
+    hand = th.HandLandmarker(result_callback)
 
     while True:
         image = camera.read()

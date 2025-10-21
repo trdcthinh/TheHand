@@ -1,15 +1,14 @@
 import pygame as pg
 
-from thehand.core import Scene, State, Store, asset_path
-from thehand.core.store import COLOR_MOCHA_BASE
+import thehand as th
 
 
-class BasicScene(Scene):
+class BasicScene(th.Scene):
     def __init__(
         self,
         name: str,
-        state: State,
-        store: Store,
+        state: th.State,
+        store: th.Store,
     ):
         super().__init__(name, state, store)
 
@@ -24,18 +23,14 @@ class BasicScene(Scene):
         self.start_time = pg.time.get_ticks()
 
     def setup(self):
-        original_image = pg.image.load(
-            asset_path("imgs", "thehand_icon.png")
-        ).convert_alpha()
+        original_image = pg.image.load(th.asset_path("imgs", "thehand_icon.png")).convert_alpha()
 
         new_height = self.store.screen.get_height() * self.icon_ratio
         aspect_ratio = original_image.get_width() / original_image.get_height()
         new_width = new_height * aspect_ratio
 
         self.image = pg.transform.smoothscale(original_image, (new_width, new_height))
-        self.image_rect = self.image.get_rect(
-            center=self.store.screen.get_rect().center
-        )
+        self.image_rect = self.image.get_rect(center=self.store.screen.get_rect().center)
 
     def handle_events(self):
         for event in self.state.events:
@@ -53,10 +48,8 @@ class BasicScene(Scene):
             self.alpha = 0
 
     def render(self):
-        self.store.screen.fill(COLOR_MOCHA_BASE)
+        self.store.screen.fill(th.COLOR_MOCHA_BASE)
 
         if self.image:
             self.image.set_alpha(self.alpha)
             self.store.screen.blit(self.image, self.image_rect)
-
-        pg.display.flip()

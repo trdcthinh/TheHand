@@ -1,10 +1,8 @@
-import pygame as pg
-
-from thehand.core import Scene, State, Store
+import thehand as th
 
 
-class CreditScene(Scene):
-    def __init__(self, name: str, state: State, store: Store):
+class CreditScene(th.Scene):
+    def __init__(self, name: str, state: th.State, store: th.Store):
         super().__init__(name, state, store)
 
     def setup(self):
@@ -45,6 +43,7 @@ class CreditScene(Scene):
         pass
 
     def render(self):
+<<<<<<< HEAD:src/thehand/game/scene/decor/credit_scene.py
         self.store.screen.fill(self.bg_color)
 
         # Vẽ từng dòng chữ
@@ -56,3 +55,8 @@ class CreditScene(Scene):
             y += 40
 
         pg.display.flip()
+=======
+        self.store.screen.fill((25, 25, 25))
+        text = self.store.font_text_24.render(self.name, True, (240, 240, 240))
+        self.store.screen.blit(text, (100, 100))
+>>>>>>> 2e70353244bc5f403f626c6aec789fe818477d33:src/thehand/game/scenes/decor/credit_scene.py

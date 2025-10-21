@@ -7,8 +7,7 @@ from mediapipe.tasks.python.vision.face_landmarker import (
     FaceLandmarkerResult,
 )
 
-from thehand.core import Camera, FaceLandmarker
-from thehand.core.vision import get_smile_score, is_smile
+import thehand as th
 
 detection_result = None
 
@@ -22,7 +21,7 @@ def result_callback(result: FaceLandmarkerResult):
 
     face_blendshapes = result.face_blendshapes[0]
 
-    print(is_smile(face_blendshapes), get_smile_score(face_blendshapes))
+    print(th.is_smile(face_blendshapes), th.get_smile_score(face_blendshapes))
 
 
 def draw(rgb_image, detection_result):
@@ -35,12 +34,7 @@ def draw(rgb_image, detection_result):
         # Draw the face landmarks.
         face_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
         face_landmarks_proto.landmark.extend(
-            [
-                landmark_pb2.NormalizedLandmark(
-                    x=landmark.x, y=landmark.y, z=landmark.z
-                )
-                for landmark in face_landmarks
-            ]
+            [landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in face_landmarks]
         )
 
         solutions.drawing_utils.draw_landmarks(
@@ -69,8 +63,8 @@ def draw(rgb_image, detection_result):
 
 
 def main():
-    camera = Camera()
-    hand = FaceLandmarker(result_callback)
+    camera = th.Camera()
+    hand = th.FaceLandmarker(result_callback)
 
     while True:
         image = camera.read()

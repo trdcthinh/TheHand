@@ -2,26 +2,14 @@ from threading import Thread
 
 import pygame as pg
 
-from thehand.core import (
-    Camera,
-    Event,
-    EventCode,
-    FaceLandmarker,
-    HandLandmarker,
-    PoseLandmarker,
-    SceneManager,
-    SpeechRecognition,
-    State,
-    Store,
-)
+import thehand as th
 from thehand.game.config import GAME_NAME
-from thehand.game.scene import (
+from thehand.game.scenes import (
     CreditScene,
     HintScene,
     MainMenuScene,
     PacmanScene,
     SplashScene,
-    TutorialScene,
 )
 
 
@@ -32,37 +20,32 @@ class TheHandGame:
         pg.mixer.init()
         pg.display.set_caption(GAME_NAME)
 
-        self.state = State()
-        self.store = Store()
+        self.state = th.State()
+        self.store = th.Store()
 
         self.clock = pg.Clock()
         self.vision_clock = pg.Clock()
 
-        self.scene_manager: SceneManager | None = None
+        self.scene_manager: th.SceneManager | None = None
 
-        self.sr: SpeechRecognition | None = None
+        self.sr: th.SpeechRecognition | None = None
 
-        self.camera: Camera | None = None
-        self.face: FaceLandmarker | None = None
-        self.hand: HandLandmarker | None = None
-        self.pose: PoseLandmarker | None = None
+        self.camera: th.Camera | None = None
+        self.face: th.FaceLandmarker | None = None
+        self.hand: th.HandLandmarker | None = None
+        self.pose: th.PoseLandmarker | None = None
 
     def init(self) -> None:
-        screen_info = pg.display.Info()
+        self.store.screen = pg.display.set_mode(self.state.window_size, self.state.display_flag)
 
-        self.state.window_size = (screen_info.current_w, screen_info.current_h)
-        self.store.screen = pg.display.set_mode(
-            self.state.window_size, self.state.display_flag
-        )
+        self.scene_manager = th.SceneManager(self.state, self.store)
 
-        self.scene_manager = SceneManager(self.state, self.store)
+        self.sr = th.SpeechRecognition(self.state)
 
-        self.sr = SpeechRecognition(self.state)
-
-        self.camera = Camera()
-        self.face = FaceLandmarker()
-        self.hand = HandLandmarker()
-        self.pose = PoseLandmarker()
+        self.camera = th.Camera()
+        self.face = th.FaceLandmarker()
+        self.hand = th.HandLandmarker()
+        self.pose = th.PoseLandmarker()
 
         self._setup_scenes()
 
@@ -77,9 +60,10 @@ class TheHandGame:
         vision_thread.start()
 
         while True:
+            self.state.now = pg.time.get_ticks()
             self._handle_events()
             self.scene_manager()
-            self.clock.tick(self.state.FPS)
+            self.state.dt = self.clock.tick(self.state.FPS)
 
     def quit(self) -> None:
         self.sr.stop()
@@ -90,30 +74,29 @@ class TheHandGame:
 
         exit(0)
 
+    def _create_and_add_scenes(self) -> None:
+        self.splash_scene = SplashScene("splash", self.state, self.store)
+        self.scene_manager += self.splash_scene
+
+        self.main_menu_scene = MainMenuScene("main_menu", self.state, self.store, self.sr)
+        self.scene_manager += self.main_menu_scene
+
+        self.hint_pacman_scene = HintScene("hint_pacman", self.state, self.store)
+        self.scene_manager += self.hint_pacman_scene
+
+        self.pacman_scene = PacmanScene("pacman", self.state, self.store, self.hand)
+        self.scene_manager += self.pacman_scene
+
+        self.credit_scene = CreditScene("credit", self.state, self.store)
+        self.scene_manager += self.credit_scene
+
     def _setup_scenes(self) -> None:
-        splash_scene = SplashScene("splash", self.state, self.store)
-        main_menu_scene = MainMenuScene("main_menu", self.state, self.store, self.sr)
-        tutorial_scene = TutorialScene("tutorial", self.state, self.store)
-        hint_pacman_scene = HintScene("hint_pacman", self.state, self.store)
-        pacman_scene = PacmanScene("pacman", self.state, self.store, self.hand)
-        credit_scene = CreditScene("credit", self.state, self.store)
+        self._create_and_add_scenes()
 
-        splash_scene >> main_menu_scene >> hint_pacman_scene
-        # tutorial_scene >> main_menu_scene
+        self.splash_scene >> self.main_menu_scene >> self.hint_pacman_scene
+        self.hint_pacman_scene >> self.pacman_scene >> self.credit_scene
 
-        hint_pacman_scene >> pacman_scene
-
-        (
-            self.scene_manager
-            + splash_scene
-            + tutorial_scene
-            + main_menu_scene
-            + hint_pacman_scene
-            + pacman_scene
-            + credit_scene
-        )
-
-        self.scene_manager << splash_scene
+        self.scene_manager << self.splash_scene
 
     def _run_vision(self) -> None:
         if not self.face:
@@ -159,10 +142,10 @@ class TheHandGame:
             if event.type == pg.QUIT:
                 self.quit()
 
-            if event.type == Event.COMMAND.value:
-                if event.code == EventCode.COMMAND_NEXT_SCENE:
+            if event.type == th.THEHAND_EVENT:
+                if event.code == th.C_NEXT_SCENE:
                     self._next_scene()
-                if event.code == EventCode.COMMAND_CHANGE_SCENE:
+                if event.code == th.C_CHANGE_SCENE:
                     self._change_scene(event.value)
 
         if self.state.debug_mode:
@@ -170,14 +153,17 @@ class TheHandGame:
 
     def _debug_handle_events(self) -> None:
         for event in self.state.events:
-            if event.type == pg.K_KP_ENTER:
-                self._next_scene()
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_TAB:
+                    self._next_scene()
 
 
 def main():
     game = TheHandGame()
 
     game.state.debug_mode = True
+    game.state.window_size = (1280, 720)
+    game.state.display_flag = pg.SHOWN
 
     game.init()
     game.run()

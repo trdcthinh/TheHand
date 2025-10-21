@@ -1,14 +1,14 @@
 import pygame as pg
 
-from thehand.core import Scene, State, Store, asset_path
+import thehand as th
 
 
-class SplashScene(Scene):
+class SplashScene(th.Scene):
     def __init__(
         self,
         name: str,
-        state: State,
-        store: Store,
+        state: th.State,
+        store: th.Store,
         icon_ratio: float = 0.3,
     ):
         super().__init__(name, state, store)
@@ -27,21 +27,15 @@ class SplashScene(Scene):
         self.start_time = pg.time.get_ticks()
 
     def setup(self):
-        original_image = pg.image.load(
-            asset_path("imgs", "thehand_icon.png")
-        ).convert_alpha()
+        original_image = pg.image.load(th.asset_path("imgs", "thehand_icon.png")).convert_alpha()
         new_height = self.store.screen.get_height() * self.icon_ratio
         aspect_ratio = original_image.get_width() / original_image.get_height()
         new_width = new_height * aspect_ratio
         self.image = pg.transform.smoothscale(original_image, (new_width, new_height))
-        self.image_rect = self.image.get_rect(
-            center=self.store.screen.get_rect().center
-        )
+        self.image_rect = self.image.get_rect(center=self.store.screen.get_rect().center)
 
     def handle_events(self):
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                self.quit = True
+        return
 
     def update(self):
         if self.alpha < 255:
@@ -52,16 +46,14 @@ class SplashScene(Scene):
             self.scale += self.zoom_speed
             self.scale = min(self.scale, 1.0)
 
-        if pg.time.get_ticks() - self.start_time > self.duration:
-            self.done = True
+        if self.state.now - self.start_time > self.duration:
+            pg.event.post(th.create_next_scene_event())
 
     def render(self):
-        self.store.screen.fill((25, 25, 25))
+        self.store.screen.fill(th.COLOR_MOCHA_CRUST)
 
         if self.image:
             scaled_image = pg.transform.smoothscale_by(self.image, self.scale)
             scaled_image.set_alpha(self.alpha)
             scaled_rect = scaled_image.get_rect(center=self.image_rect.center)
             self.store.screen.blit(scaled_image, scaled_rect)
-
-        pg.display.flip()

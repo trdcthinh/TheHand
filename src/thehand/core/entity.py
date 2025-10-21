@@ -1,27 +1,16 @@
 from abc import ABC, abstractmethod
 
-import pygame as pg
+from .state import State
+from .store import Store
 
 
 class Entity(ABC):
-    def __init__(
-        self,
-        x: float,
-        y: float,
-        width: int,
-        height: int,
-    ):
-        self.x: float = x
-        self.y: float = y
-        self.width: int = width
-        self.height: int = height
+    def __init__(self, state: State, store: Store):
+        self.state = state
+        self.store = store
 
     @abstractmethod
-    def setup(self) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    def handle_events(self, events: list[pg.Event]) -> None:
+    def handle_events(self) -> None:
         raise NotImplementedError
 
     @abstractmethod

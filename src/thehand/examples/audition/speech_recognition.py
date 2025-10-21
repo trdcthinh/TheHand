@@ -1,5 +1,4 @@
-from thehand.core import SpeechRecognition, State
-from thehand.core.utils import print_inline
+import thehand as th
 
 translation_count = 0
 translations: list[str] = []
@@ -9,13 +8,13 @@ def result_callback(text: str):
     global translation_count
     translation_count += 1
     translations.append(text)
-    print_inline(text)
+    th.print_inline(text)
 
 
 def main():
-    state = State()
+    state = th.State()
 
-    sr = SpeechRecognition(state, result_callback)
+    sr = th.SpeechRecognition(state, result_callback)
 
     try:
         sr.run()

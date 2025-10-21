@@ -1,14 +1,14 @@
 import pygame as pg
-import os
-import numpy as np
-from thehand.core import Scene, State, Store, asset_path
 
-class MagicGestureScene(Scene):
-    def __init__(self, name: str, state: State, store: Store, screen: pg.Surface):
+import thehand as th
+
+
+class MagicGestureScene(th.Scene):
+    def __init__(self, name: str, state: th.State, store: th.Store, screen: pg.Surface):
         super().__init__(name, state, store)
         self.screen = screen  # Store the screen surface
         # Load background
-        bg_path = asset_path("imgs", "mgs_background.jpg")
+        bg_path = th.asset_path("imgs", "mgs_background.jpg")
         try:
             self.bg_img = pg.image.load(bg_path).convert()
             self.bg_img = pg.transform.scale(self.bg_img, self.screen.get_size())
@@ -16,7 +16,7 @@ class MagicGestureScene(Scene):
         except pg.error as e:
             print(f"[ERROR] Error loading background image {bg_path}: {e}")
             self.bg_img = pg.Surface(self.screen.get_size())
-            self.bg_img.fill((0, 0, 0)) # Fallback to black background
+            self.bg_img.fill((0, 0, 0))  # Fallback to black background
 
         # Find ground y position (pixel đầu tiên từ trên xuống có màu rgba(150,203,87))
         ground_y = None
@@ -36,14 +36,14 @@ class MagicGestureScene(Scene):
         print(f"[DEBUG] Ground Y position found: {ground_y}")
 
         # Load and process main character
-        char_path = asset_path("imgs", "mgs_main_character.png")
+        char_path = th.asset_path("imgs", "mgs_main_character.png")
         try:
             char_img = pg.image.load(char_path).convert_alpha()
             print(f"[DEBUG] Character image loaded: {char_path}")
             # Remove black pixels (rgba <3, <3, <3)
             arr = pg.surfarray.pixels3d(char_img)
             alpha = pg.surfarray.pixels_alpha(char_img)
-            mask = (arr[:,:,0] < 5) & (arr[:,:,1] < 5) & (arr[:,:,2] < 5)
+            mask = (arr[:, :, 0] < 5) & (arr[:, :, 1] < 5) & (arr[:, :, 2] < 5)
             alpha[mask] = 0
             del arr, alpha
             # Resize character
@@ -59,7 +59,7 @@ class MagicGestureScene(Scene):
         except pg.error as e:
             print(f"[ERROR] Error loading character image {char_path}: {e}")
             self.char_img = pg.Surface((50, 50), pg.SRCALPHA)
-            self.char_img.fill((255, 0, 0, 128)) # Fallback to red square
+            self.char_img.fill((255, 0, 0, 128))  # Fallback to red square
             self.char_rect = self.char_img.get_rect(centerx=self.screen.get_width() // 2, bottom=ground_y)
 
     def setup(self):
