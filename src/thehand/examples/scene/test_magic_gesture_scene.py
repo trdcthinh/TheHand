@@ -1,5 +1,9 @@
 import pygame as pg
+<<<<<<< HEAD
+from thehand.game.scenes.level.Magic_gesture_scene import MagicGestureScene
+=======
 
+>>>>>>> b6c4f5e1f92c379e7209f53be54d43c50d1d168b
 import thehand as th
 from thehand.game.scenes.level.magic_gesture_scene import MagicGestureScene
 
