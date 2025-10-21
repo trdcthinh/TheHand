@@ -120,9 +120,6 @@ class MlrsScene(NovelScene):
     def render(self):
         super().render()
 
-        if self.pages[self.current_page_index].name == "wait":
-            self.noise.render()
-
     def _fire_callback(self, text: str):
         if "fire" in text.lower():
             speech_volume = self.state.get_speech_volume()

@@ -1,4 +1,3 @@
-from . import game as game
 from .core import C_BOOL as C_BOOL
 from .core import C_CHANGE_SCENE as C_CHANGE_SCENE
 from .core import C_NEXT_SCENE as C_NEXT_SCENE
