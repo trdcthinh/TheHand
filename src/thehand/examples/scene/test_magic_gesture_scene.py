@@ -1,6 +1,7 @@
 import pygame as pg
-from thehand.game.scenes.level.magic_gesture_scene import MagicGestureScene
+
 import thehand as th
+from thehand.game.scenes.level.magic_gesture_scene import MagicGestureScene
 
 
 def main():
@@ -12,14 +13,12 @@ def main():
     scene = MagicGestureScene("MagicGesture", state, store, screen)
     scene.setup()
     running = True
-    while running and not scene.done:
+    while running:
         state.events = pg.event.get()
         scene.handle_events()
         scene.update()
         scene.render()
         clock.tick(state.FPS)
-        if scene.done:
-            running = False
     pg.quit()
 
 

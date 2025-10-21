@@ -5,13 +5,12 @@ import pygame as pg
 from PIL import Image
 
 import thehand as th
+from thehand.game.widgets import PlayerSpeech
 
 
 class MainMenuScene(th.Scene):
-    def __init__(self, name: str, state: th.State, store: th.Store, sr: th.SpeechRecognition):
-        super().__init__(name, state, store)
-
-        self.sr = sr
+    def __init__(self, state: th.State, store: th.Store, name: str):
+        super().__init__(state, store, name)
 
         self.bg_frames = []
         self.bg_frame_idx = 0
@@ -48,9 +47,10 @@ class MainMenuScene(th.Scene):
 
         self._start_button_pressed = False
 
+        self.player_speech = PlayerSpeech(self.state, self.store)
+
     def setup(self):
-        self.sr.set_result_callback(self._sr_result_callback)
-        return
+        self.state.set_scene_sr_callback(self._sr_callback)
 
     def handle_events(self):
         for event in self.state.events:
@@ -95,14 +95,21 @@ class MainMenuScene(th.Scene):
             )
             self.store.screen.blit(subtitle_surf, subtitle_rect)
 
-    def _sr_result_callback(self, text):
-        if text:
-            self.last_spoken = text
-            t = text.lower()
-            if "start" in t:
-                self._press_start_button()
-            elif "quit" in t:
-                self._press_quit_button()
+        self.player_speech.render()
+
+    def _sr_callback(self, text):
+        self.player_speech.text = text
+
+        if not text:
+            return
+
+        self.last_spoken = text
+        t = text.lower()
+
+        if "start" in t:
+            self._press_start_button()
+        elif "quit" in t:
+            self._press_quit_button()
 
     def _draw_button(self, rect, text, active=False):
         bg_color = th.COLOR_MOCHA_TEXT
@@ -116,7 +123,6 @@ class MainMenuScene(th.Scene):
                 th.COLOR_MOCHA_TEXT,
             )
             rect = rect.copy()
-            rect.y += 5
 
         pg.draw.rect(self.store.screen, bg_color, rect)
         pg.draw.rect(self.store.screen, border_color, rect, 4)

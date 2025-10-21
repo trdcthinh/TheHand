@@ -5,17 +5,17 @@ import thehand as th
 
 class Toast(th.Entity):
     def __init__(
-            self,
-            state: th.State,
-            store: th.Store,
-            pos: tuple[int, int],
-            size: tuple[int, int],
-            text: str,
-            duration: int = 3000,
-            font: pg.font.Font | None = None,
-            color: tuple[int, int, int] = th.COLOR_MOCHA_TEXT,
-            bg_color: tuple[int, int, int] = th.COLOR_MOCHA_BASE,
-            bg_opacity: float = 0.8,
+        self,
+        state: th.State,
+        store: th.Store,
+        pos: tuple[int, int],
+        size: tuple[int, int],
+        text: str,
+        duration: int = 3000,
+        font: pg.font.Font | None = None,
+        color: tuple[int, int, int] = th.COLOR_MOCHA_TEXT,
+        bg_color: tuple[int, int, int] = th.COLOR_MOCHA_BASE,
+        bg_opacity: float = 0.8,
     ) -> None:
         super().__init__(state, store)
 

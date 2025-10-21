@@ -1,8 +1,8 @@
-from thehand import TheHandGame
+import thehand as th
 
 
 def main():
-    game = TheHandGame()
+    game = th.game.TheHandGame()
 
     game.state.debug_mode = True
 

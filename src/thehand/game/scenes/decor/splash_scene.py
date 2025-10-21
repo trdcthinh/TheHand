@@ -6,12 +6,12 @@ import thehand as th
 class SplashScene(th.Scene):
     def __init__(
         self,
-        name: str,
         state: th.State,
         store: th.Store,
+        name: str,
         icon_ratio: float = 0.3,
     ):
-        super().__init__(name, state, store)
+        super().__init__(state, store, name)
 
         self.image = None
         self.image_rect = None

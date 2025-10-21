@@ -57,10 +57,13 @@ from .core import THEHAND_EVENT as THEHAND_EVENT
 from .core import Camera as Camera
 from .core import Entity as Entity
 from .core import FaceLandmarker as FaceLandmarker
+from .core import FaceLandmarkerResult as FaceLandmarkerResult
 from .core import FaceResultCallback as FaceResultCallback
 from .core import HandLandmarker as HandLandmarker
+from .core import HandLandmarkerResult as HandLandmarkerResult
 from .core import HandResultCallback as HandResultCallback
 from .core import PoseLandmarker as PoseLandmarker
+from .core import PoseLandmarkerResult as PoseLandmarkerResult
 from .core import PoseResultCallback as PoseResultCallback
 from .core import Scene as Scene
 from .core import SceneManager as SceneManager
@@ -105,4 +108,3 @@ from .core import is_smile as is_smile
 from .core import normalized_landmarks_to_coordinates as normalized_landmarks_to_coordinates
 from .core import normalized_to_pixel_coordinates as normalized_to_pixel_coordinates
 from .core import print_inline as print_inline
-from .game import TheHandGame as TheHandGame
