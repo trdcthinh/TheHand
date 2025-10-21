@@ -105,7 +105,7 @@ class MainMenuScene(th.Scene):
                 self._press_quit_button()
 
     def _draw_button(self, rect, text, active=False):
-        bg_color = th.COLOR_MOCHA_MAUVE
+        bg_color = th.COLOR_MOCHA_TEXT
         border_color = th.COLOR_MOCHA_CRUST
         txt_color = th.COLOR_MOCHA_CRUST
 
@@ -113,7 +113,7 @@ class MainMenuScene(th.Scene):
             bg_color, border_color, txt_color = (
                 border_color,
                 bg_color,
-                th.COLOR_MOCHA_MAUVE,
+                th.COLOR_MOCHA_TEXT,
             )
             rect = rect.copy()
             rect.y += 5
@@ -132,7 +132,7 @@ class MainMenuScene(th.Scene):
 
     def _delayed_start(self):
         def set_done():
-            time.sleep(1.5)
+            time.sleep(1)
             pg.event.post(th.create_next_scene_event())
 
         Thread(target=set_done, daemon=True).start()

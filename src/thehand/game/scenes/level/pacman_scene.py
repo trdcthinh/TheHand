@@ -62,6 +62,7 @@ class PacmanScene(th.Scene):
         self.toasts: list[Toast] = []
 
     def setup(self):
+        self.state.hand_running = True
         self.hand.set_result_callback(self._hand_result_callback)
 
     def handle_events(self):
@@ -82,11 +83,10 @@ class PacmanScene(th.Scene):
         for collectible in collided_collectibles:
             self.score += collectible.points
             toast = Toast(
-                collectible.rect.centerx,
-                collectible.rect.centery,
-                100,
-                50,
                 self.state,
+                self.store,
+                (collectible.rect.centerx, collectible.rect.centery),
+                (100, 50),
                 f"+ {collectible.points}",
                 1000,
                 color=th.COLOR_MOCHA_BASE,
@@ -111,13 +111,12 @@ class PacmanScene(th.Scene):
         self.store.screen.blit(score_text, (10, 10))
 
         for toast in self.toasts:
-            toast.render(self.store.screen)
+            toast.render()
 
     def _hand_result_callback(self, result: HandLandmarkerResult) -> None:
         if not result.hand_world_landmarks or len(result.hand_world_landmarks) <= 0:
             return
 
-        print(len(result.hand_landmarks))
         hand_landmarks = result.hand_landmarks
 
         for i, normalized_landmarks in enumerate(hand_landmarks):

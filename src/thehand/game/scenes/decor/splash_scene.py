@@ -50,7 +50,7 @@ class SplashScene(th.Scene):
             pg.event.post(th.create_next_scene_event())
 
     def render(self):
-        self.store.screen.fill(th.COLOR_MOCHA_BASE)
+        self.store.screen.fill(th.COLOR_MOCHA_CRUST)
 
         if self.image:
             scaled_image = pg.transform.smoothscale_by(self.image, self.scale)
